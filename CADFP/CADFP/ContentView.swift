@@ -15,11 +15,25 @@ private enum AppTab: Hashable {
 struct ContentView: View {
     @State private var selectedTab: AppTab = .home
     @State private var pendingAction: HomeAction?
+    @State private var showsCadViewer = false
 
     var body: some View {
         TabView(selection: $selectedTab) {
-            HomeView { action in
-                pendingAction = action
+            NavigationStack {
+                HomeView { action in
+                    switch action {
+                    case .openRecentFile:
+                        showsCadViewer = true
+                    default:
+                        pendingAction = action
+                    }
+                }
+                .navigationDestination(isPresented: $showsCadViewer) {
+                    CADViewerScreen(
+                        title: "DWG 示例 -1",
+                        filePath: Bundle.main.path(forResource: "Sample", ofType: "dwg") ?? ""
+                    )
+                }
             }
             .tabItem {
                 Label("首页", systemImage: "house.fill")
