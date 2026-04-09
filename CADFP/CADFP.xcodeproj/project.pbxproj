@@ -6,17 +6,22 @@
 	objectVersion = 77;
 	objects = {
 
-/* Begin PBXFileReference section */
-		48A740532F874AC100465BAE /* CADFP.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CADFP.app; sourceTree = BUILT_PRODUCTS_DIR; };
-/* End PBXFileReference section */
+/* Begin PBXBuildFile section */
+		4877ED762F87B49E005709DC /* Sample.dwg in Resources */ = {isa = PBXBuildFile; fileRef = 4877ED752F87B49E005709DC /* Sample.dwg */; };
+		48A740672F8789EA00465BAE /* CADFPApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48A740642F8789EA00465BAE /* CADFPApp.swift */; };
+		48A740682F8789EA00465BAE /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48A740652F8789EA00465BAE /* ContentView.swift */; };
+		48A740692F8789EA00465BAE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 48A740632F8789EA00465BAE /* Assets.xcassets */; };
+		48A7406B2F878A1800465BAE /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48A7406A2F878A1800465BAE /* HomeView.swift */; };
+/* End PBXBuildFile section */
 
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		48A740552F874AC100465BAE /* CADFP */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = CADFP;
-			sourceTree = "<group>";
-		};
-/* End PBXFileSystemSynchronizedRootGroup section */
+/* Begin PBXFileReference section */
+		4877ED752F87B49E005709DC /* Sample.dwg */ = {isa = PBXFileReference; lastKnownFileType = file; path = Sample.dwg; sourceTree = "<group>"; };
+		48A740532F874AC100465BAE /* CADFP.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CADFP.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		48A740632F8789EA00465BAE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		48A740642F8789EA00465BAE /* CADFPApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CADFPApp.swift; sourceTree = "<group>"; };
+		48A740652F8789EA00465BAE /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		48A7406A2F878A1800465BAE /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		48A740502F874AC100465BAE /* Frameworks */ = {
@@ -32,7 +37,7 @@
 		48A7404A2F874AC100465BAE = {
 			isa = PBXGroup;
 			children = (
-				48A740552F874AC100465BAE /* CADFP */,
+				48A740662F8789EA00465BAE /* CADFP */,
 				48A740542F874AC100465BAE /* Products */,
 			);
 			sourceTree = "<group>";
@@ -43,6 +48,26 @@
 				48A740532F874AC100465BAE /* CADFP.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		48A740622F8789EA00465BAE /* Main */ = {
+			isa = PBXGroup;
+			children = (
+				48A7406A2F878A1800465BAE /* HomeView.swift */,
+			);
+			path = Main;
+			sourceTree = "<group>";
+		};
+		48A740662F8789EA00465BAE /* CADFP */ = {
+			isa = PBXGroup;
+			children = (
+				48A740632F8789EA00465BAE /* Assets.xcassets */,
+				4877ED752F87B49E005709DC /* Sample.dwg */,
+				48A740642F8789EA00465BAE /* CADFPApp.swift */,
+				48A740652F8789EA00465BAE /* ContentView.swift */,
+				48A740622F8789EA00465BAE /* Main */,
+			);
+			path = CADFP;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -59,9 +84,6 @@
 			buildRules = (
 			);
 			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				48A740552F874AC100465BAE /* CADFP */,
 			);
 			name = CADFP;
 			packageProductDependencies = (
@@ -109,6 +131,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4877ED762F87B49E005709DC /* Sample.dwg in Resources */,
+				48A740692F8789EA00465BAE /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -119,6 +143,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				48A7406B2F878A1800465BAE /* HomeView.swift in Sources */,
+				48A740672F8789EA00465BAE /* CADFPApp.swift in Sources */,
+				48A740682F8789EA00465BAE /* ContentView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -259,8 +286,9 @@
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -291,8 +319,9 @@
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
