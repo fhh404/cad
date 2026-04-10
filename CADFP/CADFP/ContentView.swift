@@ -12,27 +12,56 @@ private enum AppTab: Hashable {
     case profile
 }
 
+enum HomeRoute: Hashable {
+    case cadViewer
+    case calculatorCatalog
+    case calculatorDetail(CalculatorKind)
+    case measurementCatalog
+    case measurementRuler
+    case measurementProtractor
+}
+
 struct ContentView: View {
     @State private var selectedTab: AppTab = .home
+    @State private var homePath: [HomeRoute] = []
     @State private var pendingAction: HomeAction?
-    @State private var showsCadViewer = false
+    @State private var showsWatermarkCamera = false
 
     var body: some View {
         TabView(selection: $selectedTab) {
-            NavigationStack {
+            NavigationStack(path: $homePath) {
                 HomeView { action in
                     switch action {
                     case .openRecentFile:
-                        showsCadViewer = true
+                        homePath.append(.cadViewer)
+                    case .calculator:
+                        homePath.append(.calculatorCatalog)
+                    case .measurementTools:
+                        homePath.append(.measurementCatalog)
+                    case .watermarkCamera:
+                        showsWatermarkCamera = true
                     default:
                         pendingAction = action
                     }
                 }
-                .navigationDestination(isPresented: $showsCadViewer) {
-                    CADViewerScreen(
-                        title: "DWG 示例 -1",
-                        filePath: Bundle.main.path(forResource: "Sample", ofType: "dwg") ?? ""
-                    )
+                .navigationDestination(for: HomeRoute.self) { route in
+                    switch route {
+                    case .cadViewer:
+                        CADViewerScreen(
+                            title: "DWG 示例 -1",
+                            filePath: Bundle.main.path(forResource: "Sample", ofType: "dwg") ?? ""
+                        )
+                    case .calculatorCatalog:
+                        CalculatorCatalogScreen()
+                    case let .calculatorDetail(kind):
+                        CalculatorDetailScreen(kind: kind)
+                    case .measurementCatalog:
+                        MeasurementCatalogScreen()
+                    case .measurementRuler:
+                        RulerScreen()
+                    case .measurementProtractor:
+                        ProtractorScreen()
+                    }
                 }
             }
             .tabItem {
@@ -42,9 +71,12 @@ struct ContentView: View {
 
             MyView()
                 .tabItem {
-                    Label("我的", systemImage: "person.fill")
-                }
-                .tag(AppTab.profile)
+                Label("我的", systemImage: "person.fill")
+            }
+            .tag(AppTab.profile)
+        }
+        .fullScreenCover(isPresented: $showsWatermarkCamera) {
+            WatermarkCameraScreen()
         }
         .alert(item: $pendingAction) { action in
             Alert(

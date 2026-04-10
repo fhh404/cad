@@ -12,12 +12,32 @@
 		0E6232669D8A04CE92D25D85 /* RenderViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1B664BD21AE2E686241CB18D /* RenderViewController.mm */; };
 		3B733CA4B8BD27324536F273 /* TviCore.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4965624F858B5FC8BC9379B7 /* TviCore.mm */; };
 		3EF6DB11C7BD11D87A9C5CCC /* TviImportParameters.mm in Sources */ = {isa = PBXBuildFile; fileRef = 030EF0ABEDDD0762C4723F60 /* TviImportParameters.mm */; };
+		455E671643C0177A498D1F5E /* WatermarkCameraCapture.swift in Sources */ = {isa = PBXBuildFile; fileRef = A62BA8C24C2E8C43EEA2A601 /* WatermarkCameraCapture.swift */; };
+		4874CE9846A71889F89DC13E /* WatermarkModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C39F228DBF90C10EAC2103A /* WatermarkModels.swift */; };
+		4F2A8B7C6D5E4A3B2C1D0E9F /* WatermarkLocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A5B4C3D2E1F0A9B8C7D6E5F /* WatermarkLocationService.swift */; };
 		4877ED762F87B49E005709DC /* Sample.dwg in Resources */ = {isa = PBXBuildFile; fileRef = 4877ED752F87B49E005709DC /* Sample.dwg */; };
 		48A740672F8789EA00465BAE /* CADFPApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48A740642F8789EA00465BAE /* CADFPApp.swift */; };
 		48A740682F8789EA00465BAE /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48A740652F8789EA00465BAE /* ContentView.swift */; };
 		48A740692F8789EA00465BAE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 48A740632F8789EA00465BAE /* Assets.xcassets */; };
 		48A7406B2F878A1800465BAE /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48A7406A2F878A1800465BAE /* HomeView.swift */; };
+		4A563EA5DF2602C2898322E4 /* WatermarkModelsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD0D3FAF88DB8146F8A85763 /* WatermarkModelsTests.swift */; };
 		4B887775A576145354939EAD /* TviTools.mm in Sources */ = {isa = PBXBuildFile; fileRef = 157A90A95BEE7A35B68527FA /* TviTools.mm */; };
+		BF100001AA110001CC120001 /* CalculatorModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF100001AA110001CC120001 /* CalculatorModels.swift */; };
+		BF100002AA110001CC120001 /* CalculatorEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF100002AA110001CC120001 /* CalculatorEngine.swift */; };
+		BF100003AA110001CC120001 /* CalculatorFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF100003AA110001CC120001 /* CalculatorFormatting.swift */; };
+		BF100004AA110001CC120001 /* CalculatorTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF100004AA110001CC120001 /* CalculatorTheme.swift */; };
+		BF100005AA110001CC120001 /* CalculatorCatalogScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF100005AA110001CC120001 /* CalculatorCatalogScreen.swift */; };
+		BF100006AA110001CC120001 /* CalculatorDetailScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF100006AA110001CC120001 /* CalculatorDetailScreen.swift */; };
+		BF100007AA110001CC120001 /* CalculatorEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF100007AA110001CC120001 /* CalculatorEngineTests.swift */; };
+		BF200001AA110001CC120001 /* MeasurementModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF200001AA110001CC120001 /* MeasurementModels.swift */; };
+		BF200002AA110001CC120001 /* RulerDeviceRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF200002AA110001CC120001 /* RulerDeviceRegistry.swift */; };
+		BF200003AA110001CC120001 /* RulerGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF200003AA110001CC120001 /* RulerGeometry.swift */; };
+		BF200004AA110001CC120001 /* MeasurementCatalogScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF200004AA110001CC120001 /* MeasurementCatalogScreen.swift */; };
+		BF200005AA110001CC120001 /* RulerScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF200005AA110001CC120001 /* RulerScreen.swift */; };
+		BF200006AA110001CC120001 /* RulerGeometryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF200006AA110001CC120001 /* RulerGeometryTests.swift */; };
+		BF200007AA110001CC120001 /* ProtractorGeometryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF200007AA110001CC120001 /* ProtractorGeometryTests.swift */; };
+		BF200008AA110001CC120001 /* ProtractorGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF200008AA110001CC120001 /* ProtractorGeometry.swift */; };
+		BF200009AA110001CC120001 /* ProtractorScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF200009AA110001CC120001 /* ProtractorScreen.swift */; };
 		4E039D043BB8643B3DED18B6 /* CADLayerItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 535581FED2FF68B0D2CD82C2 /* CADLayerItem.m */; };
 		57425B11277CCA1A0C7CC822 /* TviMemoryStatus.mm in Sources */ = {isa = PBXBuildFile; fileRef = 37E555DF90BF14DA9745FFFF /* TviMemoryStatus.mm */; };
 		5BA54139AF5E5A7392C00025 /* CADBaseViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = D18227E519CB6846BBDB626D /* CADBaseViewController.mm */; };
@@ -27,10 +47,22 @@
 		93D8D913CA56B58AF98590B0 /* TviGlobalParameters.mm in Sources */ = {isa = PBXBuildFile; fileRef = 89C1C9D12C98B2C9BC330361 /* TviGlobalParameters.mm */; };
 		9847AFE9233C07E8CC75FD6A /* TviAxisControl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 12FC66DFB0EA09D0A0FD36B5 /* TviAxisControl.cpp */; };
 		98864A387D710A2F7BB44A1F /* CADViewerScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F0FAF25C6E74F057EEA0E9B /* CADViewerScreen.swift */; };
+		9E8F74113B99095E5693BF3E /* WatermarkCameraViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F92ACA114A07967F896A0E /* WatermarkCameraViewModel.swift */; };
 		A792F298CA49C1BAD6A6AC0B /* TviLimitManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3DC42DC9A40D81AF5800A61A /* TviLimitManager.cpp */; };
+		C3BCC5E8320748CD3756730B /* WatermarkCameraScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D689C8914AE5DA6CB897AF8 /* WatermarkCameraScreen.swift */; };
 		C910362D9039E664808D35AD /* TviProgressMeter.mm in Sources */ = {isa = PBXBuildFile; fileRef = CEB1738F6356C259E0C53178 /* TviProgressMeter.mm */; };
 		E6CAE09C6E9B9967FB27329F /* TviDraggers.mm in Sources */ = {isa = PBXBuildFile; fileRef = F3FB2A599F66FA2A0973B1A5 /* TviDraggers.mm */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		8F2B4DAC3E191DE887816B01 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 48A7404B2F874AC100465BAE /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 48A740522F874AC100465BAE;
+			remoteInfo = CADFP;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		030EF0ABEDDD0762C4723F60 /* TviImportParameters.mm */ = {isa = PBXFileReference; includeInIndex = 1; path = TviImportParameters.mm; sourceTree = "<group>"; };
@@ -38,6 +70,7 @@
 		10C3BA369C4FF70B7445C35B /* RenderViewController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = RenderViewController.h; sourceTree = "<group>"; };
 		12FC66DFB0EA09D0A0FD36B5 /* TviAxisControl.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = TviAxisControl.cpp; sourceTree = "<group>"; };
 		157A90A95BEE7A35B68527FA /* TviTools.mm */ = {isa = PBXFileReference; includeInIndex = 1; path = TviTools.mm; sourceTree = "<group>"; };
+		16F92ACA114A07967F896A0E /* WatermarkCameraViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WatermarkCameraViewModel.swift; sourceTree = "<group>"; };
 		1B664BD21AE2E686241CB18D /* RenderViewController.mm */ = {isa = PBXFileReference; includeInIndex = 1; path = RenderViewController.mm; sourceTree = "<group>"; };
 		1B931E5A5373F8FEB6A7FA26 /* TviMemoryStatus.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = TviMemoryStatus.h; sourceTree = "<group>"; };
 		1C5CB60FD66C3B037DEED2C9 /* TviImportParameters.hpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.h; path = TviImportParameters.hpp; sourceTree = "<group>"; };
@@ -51,8 +84,10 @@
 		48A740652F8789EA00465BAE /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		48A7406A2F878A1800465BAE /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		4965624F858B5FC8BC9379B7 /* TviCore.mm */ = {isa = PBXFileReference; includeInIndex = 1; path = TviCore.mm; sourceTree = "<group>"; };
+		4C39F228DBF90C10EAC2103A /* WatermarkModels.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WatermarkModels.swift; sourceTree = "<group>"; };
 		4E9DBEEBA7EA92DB2E6A87EE /* CADViewerBridgeView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CADViewerBridgeView.swift; sourceTree = "<group>"; };
 		4F35053662AD56AD4C37BEE3 /* CADFP-Bridging-Header.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "CADFP-Bridging-Header.h"; sourceTree = "<group>"; };
+		6A5B4C3D2E1F0A9B8C7D6E5F /* WatermarkLocationService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WatermarkLocationService.swift; sourceTree = "<group>"; };
 		535581FED2FF68B0D2CD82C2 /* CADLayerItem.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CADLayerItem.m; sourceTree = "<group>"; };
 		5475C459C40EEE951DE57460 /* CADBaseViewController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CADBaseViewController.h; sourceTree = "<group>"; };
 		55713757129A941F6ACE5705 /* CADLayerItem.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CADLayerItem.h; sourceTree = "<group>"; };
@@ -60,20 +95,40 @@
 		64F8D8A0010616125501FFAD /* TviActivator.hpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.h; path = TviActivator.hpp; sourceTree = "<group>"; };
 		65664B61BC885CE9A72E8001 /* TviDraggers.hpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.h; path = TviDraggers.hpp; sourceTree = "<group>"; };
 		6AC80D0F3514E5E863578466 /* TviProgressControl.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = TviProgressControl.h; sourceTree = "<group>"; };
+		6D689C8914AE5DA6CB897AF8 /* WatermarkCameraScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WatermarkCameraScreen.swift; sourceTree = "<group>"; };
 		6F0FAF25C6E74F057EEA0E9B /* CADViewerScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CADViewerScreen.swift; sourceTree = "<group>"; };
 		70476CA288CD505E0677EB68 /* TviProgressMeter.hpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.h; path = TviProgressMeter.hpp; sourceTree = "<group>"; };
 		758E87CFCCC932C4D39FC801 /* CADViewerViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CADViewerViewModel.swift; sourceTree = "<group>"; };
 		89C1C9D12C98B2C9BC330361 /* TviGlobalParameters.mm */ = {isa = PBXFileReference; includeInIndex = 1; path = TviGlobalParameters.mm; sourceTree = "<group>"; };
 		8E3C8101049EBBE7B66F45BE /* TviLimitManager.hpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.h; path = TviLimitManager.hpp; sourceTree = "<group>"; };
 		968692E51BFFDAC430CC59F6 /* TviTools.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = TviTools.h; sourceTree = "<group>"; };
+		A62BA8C24C2E8C43EEA2A601 /* WatermarkCameraCapture.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WatermarkCameraCapture.swift; sourceTree = "<group>"; };
+		B18D05F6DAF35CCA52FE2BAC /* CADFPTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CADFPTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B2931A55DC6712E1DAFC7F4C /* TviActivator.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = TviActivator.cpp; sourceTree = "<group>"; };
 		CB75FB1333EAFBFF2463AD38 /* CADEngineBootstrap.mm */ = {isa = PBXFileReference; includeInIndex = 1; path = CADEngineBootstrap.mm; sourceTree = "<group>"; };
+		CF100001AA110001CC120001 /* CalculatorModels.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CalculatorModels.swift; sourceTree = "<group>"; };
+		CF100002AA110001CC120001 /* CalculatorEngine.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CalculatorEngine.swift; sourceTree = "<group>"; };
+		CF100003AA110001CC120001 /* CalculatorFormatting.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CalculatorFormatting.swift; sourceTree = "<group>"; };
+		CF100004AA110001CC120001 /* CalculatorTheme.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CalculatorTheme.swift; sourceTree = "<group>"; };
+		CF100005AA110001CC120001 /* CalculatorCatalogScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CalculatorCatalogScreen.swift; sourceTree = "<group>"; };
+		CF100006AA110001CC120001 /* CalculatorDetailScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CalculatorDetailScreen.swift; sourceTree = "<group>"; };
+		CF100007AA110001CC120001 /* CalculatorEngineTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CalculatorEngineTests.swift; path = CADFPTests/CalculatorEngineTests.swift; sourceTree = "<group>"; };
+		CF200001AA110001CC120001 /* MeasurementModels.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MeasurementModels.swift; sourceTree = "<group>"; };
+		CF200002AA110001CC120001 /* RulerDeviceRegistry.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RulerDeviceRegistry.swift; sourceTree = "<group>"; };
+		CF200003AA110001CC120001 /* RulerGeometry.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RulerGeometry.swift; sourceTree = "<group>"; };
+		CF200004AA110001CC120001 /* MeasurementCatalogScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MeasurementCatalogScreen.swift; sourceTree = "<group>"; };
+		CF200005AA110001CC120001 /* RulerScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RulerScreen.swift; sourceTree = "<group>"; };
+		CF200006AA110001CC120001 /* RulerGeometryTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RulerGeometryTests.swift; path = CADFPTests/RulerGeometryTests.swift; sourceTree = "<group>"; };
+		CF200007AA110001CC120001 /* ProtractorGeometryTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ProtractorGeometryTests.swift; path = CADFPTests/ProtractorGeometryTests.swift; sourceTree = "<group>"; };
+		CF200008AA110001CC120001 /* ProtractorGeometry.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ProtractorGeometry.swift; sourceTree = "<group>"; };
+		CF200009AA110001CC120001 /* ProtractorScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ProtractorScreen.swift; sourceTree = "<group>"; };
 		CDA978F1BECAF3CB17E61FF0 /* TviAxisControl.hpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.h; path = TviAxisControl.hpp; sourceTree = "<group>"; };
 		CEB1738F6356C259E0C53178 /* TviProgressMeter.mm */ = {isa = PBXFileReference; includeInIndex = 1; path = TviProgressMeter.mm; sourceTree = "<group>"; };
 		D18227E519CB6846BBDB626D /* CADBaseViewController.mm */ = {isa = PBXFileReference; includeInIndex = 1; path = CADBaseViewController.mm; sourceTree = "<group>"; };
 		DC60B757231C53E7B499A1AE /* TviGlobalParameters.hpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.h; path = TviGlobalParameters.hpp; sourceTree = "<group>"; };
 		EA44A5AB9B6B0F590B1BB492 /* CADEngineBootstrap.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CADEngineBootstrap.h; sourceTree = "<group>"; };
 		F3FB2A599F66FA2A0973B1A5 /* TviDraggers.mm */ = {isa = PBXFileReference; includeInIndex = 1; path = TviDraggers.mm; sourceTree = "<group>"; };
+		FD0D3FAF88DB8146F8A85763 /* WatermarkModelsTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WatermarkModelsTests.swift; path = CADFPTests/WatermarkModelsTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -84,9 +139,23 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		667EE0DD3A7E3FE066DCD3CC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		10C67ABE8A3F197DC0101C60 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = iOS;
+			sourceTree = "<group>";
+		};
 		2EC41AAB9B46E89C494B87E8 /* CADBridge */ = {
 			isa = PBXGroup;
 			children = (
@@ -110,6 +179,8 @@
 			children = (
 				48A740662F8789EA00465BAE /* CADFP */,
 				48A740542F874AC100465BAE /* Products */,
+				EDD23BB164691FCE6AD32CA2 /* CADFPTests */,
+				D029DD5E85E677FA4D498D9E /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -117,6 +188,7 @@
 			isa = PBXGroup;
 			children = (
 				48A740532F874AC100465BAE /* CADFP.app */,
+				B18D05F6DAF35CCA52FE2BAC /* CADFPTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -125,7 +197,10 @@
 			isa = PBXGroup;
 			children = (
 				48A7406A2F878A1800465BAE /* HomeView.swift */,
+				DF100001AA110001CC120001 /* Calculator */,
+				DF200001AA110001CC120001 /* Measurement */,
 				F596508EB55186CC80F607BC /* CADViewer */,
+				C14EACB9FA01DE4BD72BD39D /* WatermarkCamera */,
 			);
 			path = Main;
 			sourceTree = "<group>";
@@ -183,6 +258,67 @@
 			path = AppCore;
 			sourceTree = "<group>";
 		};
+		C14EACB9FA01DE4BD72BD39D /* WatermarkCamera */ = {
+			isa = PBXGroup;
+			children = (
+				4C39F228DBF90C10EAC2103A /* WatermarkModels.swift */,
+				6A5B4C3D2E1F0A9B8C7D6E5F /* WatermarkLocationService.swift */,
+				A62BA8C24C2E8C43EEA2A601 /* WatermarkCameraCapture.swift */,
+				16F92ACA114A07967F896A0E /* WatermarkCameraViewModel.swift */,
+				6D689C8914AE5DA6CB897AF8 /* WatermarkCameraScreen.swift */,
+			);
+			name = WatermarkCamera;
+			path = WatermarkCamera;
+			sourceTree = "<group>";
+		};
+		D029DD5E85E677FA4D498D9E /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				10C67ABE8A3F197DC0101C60 /* iOS */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		DF100001AA110001CC120001 /* Calculator */ = {
+			isa = PBXGroup;
+			children = (
+				CF100001AA110001CC120001 /* CalculatorModels.swift */,
+				CF100002AA110001CC120001 /* CalculatorEngine.swift */,
+				CF100003AA110001CC120001 /* CalculatorFormatting.swift */,
+				CF100004AA110001CC120001 /* CalculatorTheme.swift */,
+				CF100005AA110001CC120001 /* CalculatorCatalogScreen.swift */,
+				CF100006AA110001CC120001 /* CalculatorDetailScreen.swift */,
+			);
+			name = Calculator;
+			path = Calculator;
+			sourceTree = "<group>";
+		};
+		DF200001AA110001CC120001 /* Measurement */ = {
+			isa = PBXGroup;
+			children = (
+				CF200001AA110001CC120001 /* MeasurementModels.swift */,
+				CF200002AA110001CC120001 /* RulerDeviceRegistry.swift */,
+				CF200003AA110001CC120001 /* RulerGeometry.swift */,
+				CF200008AA110001CC120001 /* ProtractorGeometry.swift */,
+				CF200004AA110001CC120001 /* MeasurementCatalogScreen.swift */,
+				CF200005AA110001CC120001 /* RulerScreen.swift */,
+				CF200009AA110001CC120001 /* ProtractorScreen.swift */,
+			);
+			name = Measurement;
+			path = Measurement;
+			sourceTree = "<group>";
+		};
+		EDD23BB164691FCE6AD32CA2 /* CADFPTests */ = {
+			isa = PBXGroup;
+			children = (
+				CF100007AA110001CC120001 /* CalculatorEngineTests.swift */,
+				CF200006AA110001CC120001 /* RulerGeometryTests.swift */,
+				CF200007AA110001CC120001 /* ProtractorGeometryTests.swift */,
+				FD0D3FAF88DB8146F8A85763 /* WatermarkModelsTests.swift */,
+			);
+			name = CADFPTests;
+			sourceTree = "<group>";
+		};
 		F596508EB55186CC80F607BC /* CADViewer */ = {
 			isa = PBXGroup;
 			children = (
@@ -197,6 +333,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		1F899609E93602AD90658535 /* CADFPTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 680ECF1E1C887CBA6BAE4E5E /* Build configuration list for PBXNativeTarget "CADFPTests" */;
+			buildPhases = (
+				DB8C27D9FE99C4E337368C8D /* Sources */,
+				667EE0DD3A7E3FE066DCD3CC /* Frameworks */,
+				E72DBFFA2D3A9AF9D3584FC6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				3E8FE6CD8D473F629482819E /* PBXTargetDependency */,
+			);
+			name = CADFPTests;
+			productName = CADFPTests;
+			productReference = B18D05F6DAF35CCA52FE2BAC /* CADFPTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		48A740522F874AC100465BAE /* CADFP */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 48A7405E2F874AC400465BAE /* Build configuration list for PBXNativeTarget "CADFP" */;
@@ -244,6 +398,7 @@
 			projectRoot = "";
 			targets = (
 				48A740522F874AC100465BAE /* CADFP */,
+				1F899609E93602AD90658535 /* CADFPTests */,
 			);
 		};
 /* End PBXProject section */
@@ -258,6 +413,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E72DBFFA2D3A9AF9D3584FC6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -266,6 +428,19 @@
 			buildActionMask = 2147483647;
 			files = (
 				48A7406B2F878A1800465BAE /* HomeView.swift in Sources */,
+				BF100005AA110001CC120001 /* CalculatorCatalogScreen.swift in Sources */,
+				BF100006AA110001CC120001 /* CalculatorDetailScreen.swift in Sources */,
+				BF100002AA110001CC120001 /* CalculatorEngine.swift in Sources */,
+				BF100003AA110001CC120001 /* CalculatorFormatting.swift in Sources */,
+				BF100001AA110001CC120001 /* CalculatorModels.swift in Sources */,
+				BF100004AA110001CC120001 /* CalculatorTheme.swift in Sources */,
+				BF200004AA110001CC120001 /* MeasurementCatalogScreen.swift in Sources */,
+				BF200001AA110001CC120001 /* MeasurementModels.swift in Sources */,
+				BF200008AA110001CC120001 /* ProtractorGeometry.swift in Sources */,
+				BF200009AA110001CC120001 /* ProtractorScreen.swift in Sources */,
+				BF200003AA110001CC120001 /* RulerGeometry.swift in Sources */,
+				BF200005AA110001CC120001 /* RulerScreen.swift in Sources */,
+				BF200002AA110001CC120001 /* RulerDeviceRegistry.swift in Sources */,
 				48A740672F8789EA00465BAE /* CADFPApp.swift in Sources */,
 				48A740682F8789EA00465BAE /* ContentView.swift in Sources */,
 				690F77A68421A4C71312B133 /* TviActivator.cpp in Sources */,
@@ -286,12 +461,88 @@
 				00D0825C9744B12E1FDEA62C /* CADViewerBridgeView.swift in Sources */,
 				98864A387D710A2F7BB44A1F /* CADViewerScreen.swift in Sources */,
 				625888F8BE5D25736808C472 /* CADViewerViewModel.swift in Sources */,
+				4874CE9846A71889F89DC13E /* WatermarkModels.swift in Sources */,
+				4F2A8B7C6D5E4A3B2C1D0E9F /* WatermarkLocationService.swift in Sources */,
+				455E671643C0177A498D1F5E /* WatermarkCameraCapture.swift in Sources */,
+				9E8F74113B99095E5693BF3E /* WatermarkCameraViewModel.swift in Sources */,
+				C3BCC5E8320748CD3756730B /* WatermarkCameraScreen.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DB8C27D9FE99C4E337368C8D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BF100007AA110001CC120001 /* CalculatorEngineTests.swift in Sources */,
+				BF200006AA110001CC120001 /* RulerGeometryTests.swift in Sources */,
+				BF200007AA110001CC120001 /* ProtractorGeometryTests.swift in Sources */,
+				4A563EA5DF2602C2898322E4 /* WatermarkModelsTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		3E8FE6CD8D473F629482819E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = CADFP;
+			target = 48A740522F874AC100465BAE /* CADFP */;
+			targetProxy = 8F2B4DAC3E191DE887816B01 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		0F9C9A3272D7312795068A85 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = S2Y932A6FY;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = pdia.CADFPTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CADFP.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/CADFP";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		445DFCA9DE55424762B51035 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = S2Y932A6FY;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = pdia.CADFPTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CADFP.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/CADFP";
+			};
+			name = Debug;
+		};
 		48A7405C2F874AC400465BAE /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -435,6 +686,9 @@
 					"$(SRCROOT)/可视化真机/Kernel/Include",
 					"$(SRCROOT)/可视化真机/Drawing/Include",
 				);
+				INFOPLIST_KEY_NSCameraUsageDescription = "用于拍摄施工现场、进行量角器测量并生成带水印的记录照片";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "用于获取当前街道定位并生成施工水印地址";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "用于将带水印的施工照片保存到系统相册";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -595,6 +849,9 @@
 					"$(SRCROOT)/可视化真机/Kernel/Include",
 					"$(SRCROOT)/可视化真机/Drawing/Include",
 				);
+				INFOPLIST_KEY_NSCameraUsageDescription = "用于拍摄施工现场、进行量角器测量并生成带水印的记录照片";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "用于获取当前街道定位并生成施工水印地址";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "用于将带水印的施工照片保存到系统相册";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -750,6 +1007,15 @@
 			buildConfigurations = (
 				48A7405F2F874AC400465BAE /* Debug */,
 				48A740602F874AC400465BAE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		680ECF1E1C887CBA6BAE4E5E /* Build configuration list for PBXNativeTarget "CADFPTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0F9C9A3272D7312795068A85 /* Release */,
+				445DFCA9DE55424762B51035 /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
