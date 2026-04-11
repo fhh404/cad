@@ -8,13 +8,13 @@
 
 /* Begin PBXBuildFile section */
 		00D0825C9744B12E1FDEA62C /* CADViewerBridgeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E9DBEEBA7EA92DB2E6A87EE /* CADViewerBridgeView.swift */; };
+		0AFF772898C2507F57FF0038 /* ConversionDocumentStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1C68E6882910B9E4837D6C7 /* ConversionDocumentStore.swift */; };
 		0C849EC8A4214B1FB65C7941 /* TviProgressControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 07381E0AB6BDD6152F83F57A /* TviProgressControl.m */; };
 		0E6232669D8A04CE92D25D85 /* RenderViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1B664BD21AE2E686241CB18D /* RenderViewController.mm */; };
 		3B733CA4B8BD27324536F273 /* TviCore.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4965624F858B5FC8BC9379B7 /* TviCore.mm */; };
 		3EF6DB11C7BD11D87A9C5CCC /* TviImportParameters.mm in Sources */ = {isa = PBXBuildFile; fileRef = 030EF0ABEDDD0762C4723F60 /* TviImportParameters.mm */; };
 		455E671643C0177A498D1F5E /* WatermarkCameraCapture.swift in Sources */ = {isa = PBXBuildFile; fileRef = A62BA8C24C2E8C43EEA2A601 /* WatermarkCameraCapture.swift */; };
 		4874CE9846A71889F89DC13E /* WatermarkModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C39F228DBF90C10EAC2103A /* WatermarkModels.swift */; };
-		4F2A8B7C6D5E4A3B2C1D0E9F /* WatermarkLocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A5B4C3D2E1F0A9B8C7D6E5F /* WatermarkLocationService.swift */; };
 		4877ED762F87B49E005709DC /* Sample.dwg in Resources */ = {isa = PBXBuildFile; fileRef = 4877ED752F87B49E005709DC /* Sample.dwg */; };
 		48A740672F8789EA00465BAE /* CADFPApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48A740642F8789EA00465BAE /* CADFPApp.swift */; };
 		48A740682F8789EA00465BAE /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48A740652F8789EA00465BAE /* ContentView.swift */; };
@@ -22,6 +22,20 @@
 		48A7406B2F878A1800465BAE /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48A7406A2F878A1800465BAE /* HomeView.swift */; };
 		4A563EA5DF2602C2898322E4 /* WatermarkModelsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD0D3FAF88DB8146F8A85763 /* WatermarkModelsTests.swift */; };
 		4B887775A576145354939EAD /* TviTools.mm in Sources */ = {isa = PBXBuildFile; fileRef = 157A90A95BEE7A35B68527FA /* TviTools.mm */; };
+		4E039D043BB8643B3DED18B6 /* CADLayerItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 535581FED2FF68B0D2CD82C2 /* CADLayerItem.m */; };
+		4F2A8B7C6D5E4A3B2C1D0E9F /* WatermarkLocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A5B4C3D2E1F0A9B8C7D6E5F /* WatermarkLocationService.swift */; };
+		57425B11277CCA1A0C7CC822 /* TviMemoryStatus.mm in Sources */ = {isa = PBXBuildFile; fileRef = 37E555DF90BF14DA9745FFFF /* TviMemoryStatus.mm */; };
+		5BA54139AF5E5A7392C00025 /* CADBaseViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = D18227E519CB6846BBDB626D /* CADBaseViewController.mm */; };
+		625888F8BE5D25736808C472 /* CADViewerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 758E87CFCCC932C4D39FC801 /* CADViewerViewModel.swift */; };
+		690F77A68421A4C71312B133 /* TviActivator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B2931A55DC6712E1DAFC7F4C /* TviActivator.cpp */; };
+		75BC06228B156ABFB6571563 /* CADEngineBootstrap.mm in Sources */ = {isa = PBXBuildFile; fileRef = CB75FB1333EAFBFF2463AD38 /* CADEngineBootstrap.mm */; };
+		939DDBE22D43599A43620D04 /* ConversionDocumentStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 595C0E7A9F688C3D3D6E7B74 /* ConversionDocumentStoreTests.swift */; };
+		93D8D913CA56B58AF98590B0 /* TviGlobalParameters.mm in Sources */ = {isa = PBXBuildFile; fileRef = 89C1C9D12C98B2C9BC330361 /* TviGlobalParameters.mm */; };
+		9847AFE9233C07E8CC75FD6A /* TviAxisControl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 12FC66DFB0EA09D0A0FD36B5 /* TviAxisControl.cpp */; };
+		98864A387D710A2F7BB44A1F /* CADViewerScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F0FAF25C6E74F057EEA0E9B /* CADViewerScreen.swift */; };
+		9E8F74113B99095E5693BF3E /* WatermarkCameraViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F92ACA114A07967F896A0E /* WatermarkCameraViewModel.swift */; };
+		A792F298CA49C1BAD6A6AC0B /* TviLimitManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3DC42DC9A40D81AF5800A61A /* TviLimitManager.cpp */; };
+		B962E3A1177DF5F4BF429DB3 /* ConversionModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A1F11F4D51CFFCAAF164F5 /* ConversionModels.swift */; };
 		BF100001AA110001CC120001 /* CalculatorModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF100001AA110001CC120001 /* CalculatorModels.swift */; };
 		BF100002AA110001CC120001 /* CalculatorEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF100002AA110001CC120001 /* CalculatorEngine.swift */; };
 		BF100003AA110001CC120001 /* CalculatorFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF100003AA110001CC120001 /* CalculatorFormatting.swift */; };
@@ -38,20 +52,15 @@
 		BF200007AA110001CC120001 /* ProtractorGeometryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF200007AA110001CC120001 /* ProtractorGeometryTests.swift */; };
 		BF200008AA110001CC120001 /* ProtractorGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF200008AA110001CC120001 /* ProtractorGeometry.swift */; };
 		BF200009AA110001CC120001 /* ProtractorScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF200009AA110001CC120001 /* ProtractorScreen.swift */; };
-		4E039D043BB8643B3DED18B6 /* CADLayerItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 535581FED2FF68B0D2CD82C2 /* CADLayerItem.m */; };
-		57425B11277CCA1A0C7CC822 /* TviMemoryStatus.mm in Sources */ = {isa = PBXBuildFile; fileRef = 37E555DF90BF14DA9745FFFF /* TviMemoryStatus.mm */; };
-		5BA54139AF5E5A7392C00025 /* CADBaseViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = D18227E519CB6846BBDB626D /* CADBaseViewController.mm */; };
-		625888F8BE5D25736808C472 /* CADViewerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 758E87CFCCC932C4D39FC801 /* CADViewerViewModel.swift */; };
-		690F77A68421A4C71312B133 /* TviActivator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B2931A55DC6712E1DAFC7F4C /* TviActivator.cpp */; };
-		75BC06228B156ABFB6571563 /* CADEngineBootstrap.mm in Sources */ = {isa = PBXBuildFile; fileRef = CB75FB1333EAFBFF2463AD38 /* CADEngineBootstrap.mm */; };
-		93D8D913CA56B58AF98590B0 /* TviGlobalParameters.mm in Sources */ = {isa = PBXBuildFile; fileRef = 89C1C9D12C98B2C9BC330361 /* TviGlobalParameters.mm */; };
-		9847AFE9233C07E8CC75FD6A /* TviAxisControl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 12FC66DFB0EA09D0A0FD36B5 /* TviAxisControl.cpp */; };
-		98864A387D710A2F7BB44A1F /* CADViewerScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F0FAF25C6E74F057EEA0E9B /* CADViewerScreen.swift */; };
-		9E8F74113B99095E5693BF3E /* WatermarkCameraViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F92ACA114A07967F896A0E /* WatermarkCameraViewModel.swift */; };
-		A792F298CA49C1BAD6A6AC0B /* TviLimitManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3DC42DC9A40D81AF5800A61A /* TviLimitManager.cpp */; };
+		BF200010AA110001CC120001 /* LevelGeometryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF200010AA110001CC120001 /* LevelGeometryTests.swift */; };
+		BF200011AA110001CC120001 /* LevelGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF200011AA110001CC120001 /* LevelGeometry.swift */; };
+		BF200012AA110001CC120001 /* LevelMotionEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF200012AA110001CC120001 /* LevelMotionEngine.swift */; };
+		BF200013AA110001CC120001 /* CircularLevelScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF200013AA110001CC120001 /* CircularLevelScreen.swift */; };
+		BF200014AA110001CC120001 /* BarLevelScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF200014AA110001CC120001 /* BarLevelScreen.swift */; };
 		C3BCC5E8320748CD3756730B /* WatermarkCameraScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D689C8914AE5DA6CB897AF8 /* WatermarkCameraScreen.swift */; };
 		C910362D9039E664808D35AD /* TviProgressMeter.mm in Sources */ = {isa = PBXBuildFile; fileRef = CEB1738F6356C259E0C53178 /* TviProgressMeter.mm */; };
 		E6CAE09C6E9B9967FB27329F /* TviDraggers.mm in Sources */ = {isa = PBXBuildFile; fileRef = F3FB2A599F66FA2A0973B1A5 /* TviDraggers.mm */; };
+		F924313300DDF779BA96376D /* ConversionScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8BAEA4D68A9F046D0EC266D /* ConversionScreen.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -87,13 +96,15 @@
 		4C39F228DBF90C10EAC2103A /* WatermarkModels.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WatermarkModels.swift; sourceTree = "<group>"; };
 		4E9DBEEBA7EA92DB2E6A87EE /* CADViewerBridgeView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CADViewerBridgeView.swift; sourceTree = "<group>"; };
 		4F35053662AD56AD4C37BEE3 /* CADFP-Bridging-Header.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "CADFP-Bridging-Header.h"; sourceTree = "<group>"; };
-		6A5B4C3D2E1F0A9B8C7D6E5F /* WatermarkLocationService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WatermarkLocationService.swift; sourceTree = "<group>"; };
 		535581FED2FF68B0D2CD82C2 /* CADLayerItem.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CADLayerItem.m; sourceTree = "<group>"; };
 		5475C459C40EEE951DE57460 /* CADBaseViewController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CADBaseViewController.h; sourceTree = "<group>"; };
 		55713757129A941F6ACE5705 /* CADLayerItem.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CADLayerItem.h; sourceTree = "<group>"; };
+		56A1F11F4D51CFFCAAF164F5 /* ConversionModels.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ConversionModels.swift; sourceTree = "<group>"; };
+		595C0E7A9F688C3D3D6E7B74 /* ConversionDocumentStoreTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ConversionDocumentStoreTests.swift; path = CADFPTests/ConversionDocumentStoreTests.swift; sourceTree = "<group>"; };
 		6168188197B43BF3D3850A62 /* TviCore.hpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.h; path = TviCore.hpp; sourceTree = "<group>"; };
 		64F8D8A0010616125501FFAD /* TviActivator.hpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.h; path = TviActivator.hpp; sourceTree = "<group>"; };
 		65664B61BC885CE9A72E8001 /* TviDraggers.hpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.h; path = TviDraggers.hpp; sourceTree = "<group>"; };
+		6A5B4C3D2E1F0A9B8C7D6E5F /* WatermarkLocationService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WatermarkLocationService.swift; sourceTree = "<group>"; };
 		6AC80D0F3514E5E863578466 /* TviProgressControl.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = TviProgressControl.h; sourceTree = "<group>"; };
 		6D689C8914AE5DA6CB897AF8 /* WatermarkCameraScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WatermarkCameraScreen.swift; sourceTree = "<group>"; };
 		6F0FAF25C6E74F057EEA0E9B /* CADViewerScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CADViewerScreen.swift; sourceTree = "<group>"; };
@@ -105,7 +116,10 @@
 		A62BA8C24C2E8C43EEA2A601 /* WatermarkCameraCapture.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WatermarkCameraCapture.swift; sourceTree = "<group>"; };
 		B18D05F6DAF35CCA52FE2BAC /* CADFPTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CADFPTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B2931A55DC6712E1DAFC7F4C /* TviActivator.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = TviActivator.cpp; sourceTree = "<group>"; };
+		C8BAEA4D68A9F046D0EC266D /* ConversionScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ConversionScreen.swift; sourceTree = "<group>"; };
 		CB75FB1333EAFBFF2463AD38 /* CADEngineBootstrap.mm */ = {isa = PBXFileReference; includeInIndex = 1; path = CADEngineBootstrap.mm; sourceTree = "<group>"; };
+		CDA978F1BECAF3CB17E61FF0 /* TviAxisControl.hpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.h; path = TviAxisControl.hpp; sourceTree = "<group>"; };
+		CEB1738F6356C259E0C53178 /* TviProgressMeter.mm */ = {isa = PBXFileReference; includeInIndex = 1; path = TviProgressMeter.mm; sourceTree = "<group>"; };
 		CF100001AA110001CC120001 /* CalculatorModels.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CalculatorModels.swift; sourceTree = "<group>"; };
 		CF100002AA110001CC120001 /* CalculatorEngine.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CalculatorEngine.swift; sourceTree = "<group>"; };
 		CF100003AA110001CC120001 /* CalculatorFormatting.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CalculatorFormatting.swift; sourceTree = "<group>"; };
@@ -122,9 +136,13 @@
 		CF200007AA110001CC120001 /* ProtractorGeometryTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ProtractorGeometryTests.swift; path = CADFPTests/ProtractorGeometryTests.swift; sourceTree = "<group>"; };
 		CF200008AA110001CC120001 /* ProtractorGeometry.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ProtractorGeometry.swift; sourceTree = "<group>"; };
 		CF200009AA110001CC120001 /* ProtractorScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ProtractorScreen.swift; sourceTree = "<group>"; };
-		CDA978F1BECAF3CB17E61FF0 /* TviAxisControl.hpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.h; path = TviAxisControl.hpp; sourceTree = "<group>"; };
-		CEB1738F6356C259E0C53178 /* TviProgressMeter.mm */ = {isa = PBXFileReference; includeInIndex = 1; path = TviProgressMeter.mm; sourceTree = "<group>"; };
+		CF200010AA110001CC120001 /* LevelGeometryTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LevelGeometryTests.swift; path = CADFPTests/LevelGeometryTests.swift; sourceTree = "<group>"; };
+		CF200011AA110001CC120001 /* LevelGeometry.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LevelGeometry.swift; sourceTree = "<group>"; };
+		CF200012AA110001CC120001 /* LevelMotionEngine.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LevelMotionEngine.swift; sourceTree = "<group>"; };
+		CF200013AA110001CC120001 /* CircularLevelScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CircularLevelScreen.swift; sourceTree = "<group>"; };
+		CF200014AA110001CC120001 /* BarLevelScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BarLevelScreen.swift; sourceTree = "<group>"; };
 		D18227E519CB6846BBDB626D /* CADBaseViewController.mm */ = {isa = PBXFileReference; includeInIndex = 1; path = CADBaseViewController.mm; sourceTree = "<group>"; };
+		D1C68E6882910B9E4837D6C7 /* ConversionDocumentStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ConversionDocumentStore.swift; sourceTree = "<group>"; };
 		DC60B757231C53E7B499A1AE /* TviGlobalParameters.hpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.h; path = TviGlobalParameters.hpp; sourceTree = "<group>"; };
 		EA44A5AB9B6B0F590B1BB492 /* CADEngineBootstrap.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CADEngineBootstrap.h; sourceTree = "<group>"; };
 		F3FB2A599F66FA2A0973B1A5 /* TviDraggers.mm */ = {isa = PBXFileReference; includeInIndex = 1; path = TviDraggers.mm; sourceTree = "<group>"; };
@@ -201,6 +219,7 @@
 				DF200001AA110001CC120001 /* Measurement */,
 				F596508EB55186CC80F607BC /* CADViewer */,
 				C14EACB9FA01DE4BD72BD39D /* WatermarkCamera */,
+				BDFE6170EF96CCB8F308957B /* Conversion */,
 			);
 			path = Main;
 			sourceTree = "<group>";
@@ -258,6 +277,17 @@
 			path = AppCore;
 			sourceTree = "<group>";
 		};
+		BDFE6170EF96CCB8F308957B /* Conversion */ = {
+			isa = PBXGroup;
+			children = (
+				56A1F11F4D51CFFCAAF164F5 /* ConversionModels.swift */,
+				D1C68E6882910B9E4837D6C7 /* ConversionDocumentStore.swift */,
+				C8BAEA4D68A9F046D0EC266D /* ConversionScreen.swift */,
+			);
+			name = Conversion;
+			path = Conversion;
+			sourceTree = "<group>";
+		};
 		C14EACB9FA01DE4BD72BD39D /* WatermarkCamera */ = {
 			isa = PBXGroup;
 			children = (
@@ -300,9 +330,13 @@
 				CF200002AA110001CC120001 /* RulerDeviceRegistry.swift */,
 				CF200003AA110001CC120001 /* RulerGeometry.swift */,
 				CF200008AA110001CC120001 /* ProtractorGeometry.swift */,
+				CF200011AA110001CC120001 /* LevelGeometry.swift */,
+				CF200012AA110001CC120001 /* LevelMotionEngine.swift */,
 				CF200004AA110001CC120001 /* MeasurementCatalogScreen.swift */,
 				CF200005AA110001CC120001 /* RulerScreen.swift */,
 				CF200009AA110001CC120001 /* ProtractorScreen.swift */,
+				CF200013AA110001CC120001 /* CircularLevelScreen.swift */,
+				CF200014AA110001CC120001 /* BarLevelScreen.swift */,
 			);
 			name = Measurement;
 			path = Measurement;
@@ -314,7 +348,9 @@
 				CF100007AA110001CC120001 /* CalculatorEngineTests.swift */,
 				CF200006AA110001CC120001 /* RulerGeometryTests.swift */,
 				CF200007AA110001CC120001 /* ProtractorGeometryTests.swift */,
+				CF200010AA110001CC120001 /* LevelGeometryTests.swift */,
 				FD0D3FAF88DB8146F8A85763 /* WatermarkModelsTests.swift */,
+				595C0E7A9F688C3D3D6E7B74 /* ConversionDocumentStoreTests.swift */,
 			);
 			name = CADFPTests;
 			sourceTree = "<group>";
@@ -435,6 +471,10 @@
 				BF100001AA110001CC120001 /* CalculatorModels.swift in Sources */,
 				BF100004AA110001CC120001 /* CalculatorTheme.swift in Sources */,
 				BF200004AA110001CC120001 /* MeasurementCatalogScreen.swift in Sources */,
+				BF200014AA110001CC120001 /* BarLevelScreen.swift in Sources */,
+				BF200013AA110001CC120001 /* CircularLevelScreen.swift in Sources */,
+				BF200011AA110001CC120001 /* LevelGeometry.swift in Sources */,
+				BF200012AA110001CC120001 /* LevelMotionEngine.swift in Sources */,
 				BF200001AA110001CC120001 /* MeasurementModels.swift in Sources */,
 				BF200008AA110001CC120001 /* ProtractorGeometry.swift in Sources */,
 				BF200009AA110001CC120001 /* ProtractorScreen.swift in Sources */,
@@ -466,6 +506,9 @@
 				455E671643C0177A498D1F5E /* WatermarkCameraCapture.swift in Sources */,
 				9E8F74113B99095E5693BF3E /* WatermarkCameraViewModel.swift in Sources */,
 				C3BCC5E8320748CD3756730B /* WatermarkCameraScreen.swift in Sources */,
+				B962E3A1177DF5F4BF429DB3 /* ConversionModels.swift in Sources */,
+				0AFF772898C2507F57FF0038 /* ConversionDocumentStore.swift in Sources */,
+				F924313300DDF779BA96376D /* ConversionScreen.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -476,7 +519,9 @@
 				BF100007AA110001CC120001 /* CalculatorEngineTests.swift in Sources */,
 				BF200006AA110001CC120001 /* RulerGeometryTests.swift in Sources */,
 				BF200007AA110001CC120001 /* ProtractorGeometryTests.swift in Sources */,
+				BF200010AA110001CC120001 /* LevelGeometryTests.swift in Sources */,
 				4A563EA5DF2602C2898322E4 /* WatermarkModelsTests.swift in Sources */,
+				939DDBE22D43599A43620D04 /* ConversionDocumentStoreTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

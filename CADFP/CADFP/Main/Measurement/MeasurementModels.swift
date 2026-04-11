@@ -42,7 +42,7 @@ enum MeasurementToolKind: String, CaseIterable, Identifiable, Hashable {
     }
 
     var isImplemented: Bool {
-        self == .ruler || self == .protractor
+        true
     }
 }
 

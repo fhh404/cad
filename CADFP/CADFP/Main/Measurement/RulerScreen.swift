@@ -25,7 +25,6 @@ struct RulerScreen: View {
         GeometryReader { proxy in
             let viewportSize = proxy.size
             let viewportHeight = proxy.size.height
-            let safeTop = proxy.safeAreaInsets.top
 
             ZStack(alignment: .topLeading) {
                 Color.white

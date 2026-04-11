@@ -61,6 +61,20 @@ final class LevelGeometryTests: XCTestCase {
         )
     }
 
+    func testBarMeasurementLineRotationMatchesMeasuredAngle() {
+        let sample = LevelMotionSample(
+            gravityX: -0.156434465,
+            gravityY: 0,
+            gravityZ: -0.987688341
+        )
+
+        XCTAssertEqual(
+            LevelGeometry.barMeasurementLineRotationDegrees(for: sample, orientation: .portrait),
+            -9,
+            accuracy: 0.0001
+        )
+    }
+
     func testFormatsAnglesWithTrimmedFractionDigits() {
         XCTAssertEqual(LevelGeometry.formattedAngle(9), "9°")
         XCTAssertEqual(LevelGeometry.formattedAngle(-9.4), "-9.4°")

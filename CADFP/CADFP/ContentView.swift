@@ -17,8 +17,12 @@ enum HomeRoute: Hashable {
     case calculatorCatalog
     case calculatorDetail(CalculatorKind)
     case measurementCatalog
+    case measurementCircularLevel
+    case measurementBarLevel
     case measurementRuler
     case measurementProtractor
+    case conversion(ConversionKind)
+    case conversionComplete(ConversionKind)
 }
 
 struct ContentView: View {
@@ -41,7 +45,11 @@ struct ContentView: View {
                     case .watermarkCamera:
                         showsWatermarkCamera = true
                     default:
-                        pendingAction = action
+                        if let conversionKind = action.conversionKind {
+                            homePath.append(.conversion(conversionKind))
+                        } else {
+                            pendingAction = action
+                        }
                     }
                 }
                 .navigationDestination(for: HomeRoute.self) { route in
@@ -57,10 +65,22 @@ struct ContentView: View {
                         CalculatorDetailScreen(kind: kind)
                     case .measurementCatalog:
                         MeasurementCatalogScreen()
+                    case .measurementCircularLevel:
+                        CircularLevelScreen()
+                    case .measurementBarLevel:
+                        BarLevelScreen()
                     case .measurementRuler:
                         RulerScreen()
                     case .measurementProtractor:
                         ProtractorScreen()
+                    case let .conversion(kind):
+                        ConversionScreen(kind: kind) { convertedKind in
+                            homePath.append(.conversionComplete(convertedKind))
+                        }
+                    case let .conversionComplete(kind):
+                        ConversionCompleteScreen(kind: kind) {
+                            homePath.removeAll()
+                        }
                     }
                 }
             }

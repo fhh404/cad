@@ -9,7 +9,6 @@ import SwiftUI
 
 struct MeasurementCatalogScreen: View {
     @Environment(\.dismiss) private var dismiss
-    @State private var pendingTool: MeasurementToolKind?
 
     private let columns = [
         GridItem(.flexible(), spacing: 13),
@@ -42,18 +41,21 @@ struct MeasurementCatalogScreen: View {
         .task {
             await ProtractorCaptureServiceProvider.prewarmIfAuthorized()
         }
-        .alert(item: $pendingTool) { tool in
-            Alert(
-                title: Text(tool.title),
-                message: Text("功能开发中，后续会补上真实测量能力。"),
-                dismissButton: .default(Text("知道了"))
-            )
-        }
     }
 
     @ViewBuilder
     private func card(for tool: MeasurementToolKind) -> some View {
         switch tool {
+        case .circularLevel:
+            NavigationLink(value: HomeRoute.measurementCircularLevel) {
+                MeasurementCatalogCard(tool: tool)
+            }
+            .buttonStyle(.plain)
+        case .barLevel:
+            NavigationLink(value: HomeRoute.measurementBarLevel) {
+                MeasurementCatalogCard(tool: tool)
+            }
+            .buttonStyle(.plain)
         case .ruler:
             NavigationLink(value: HomeRoute.measurementRuler) {
                 MeasurementCatalogCard(tool: tool)
@@ -61,13 +63,6 @@ struct MeasurementCatalogScreen: View {
             .buttonStyle(.plain)
         case .protractor:
             NavigationLink(value: HomeRoute.measurementProtractor) {
-                MeasurementCatalogCard(tool: tool)
-            }
-            .buttonStyle(.plain)
-        default:
-            Button {
-                pendingTool = tool
-            } label: {
                 MeasurementCatalogCard(tool: tool)
             }
             .buttonStyle(.plain)

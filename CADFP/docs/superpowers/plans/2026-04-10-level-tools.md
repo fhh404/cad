@@ -33,7 +33,7 @@ Expected: FAIL because `LevelGeometry` and tests do not exist yet.
 
 实现：
 - 圆形气泡二维偏移计算
-- 条形角度与位置换算
+- 条形角度换算
 - 角度格式化
 
 - [ ] **Step 4: Re-run the test build and verify it passes**
@@ -93,16 +93,18 @@ Expected: `TEST BUILD SUCCEEDED`.
 
 实现：
 - 白底
-- 中央大号角度文本
+- 屏幕中心蓝色水平基准线
+- 灰色虚线测量线
+- 中央角度文本
 - 右上关闭按钮
 
-- [ ] **Step 2: Add the minimal horizontal bar instrument**
+- [ ] **Step 2: Match the measurement guide design**
 
-补充一条克制的水平条和气泡，用来表达实时偏移，不破坏 Figma 的极简布局。
+按 Figma `111:1566` 保留极简视觉，蓝线固定为屏幕居中水平基准线，灰色虚线作为实时测量线。
 
 - [ ] **Step 3: Wire automatic axis switching**
 
-根据当前界面方向自动切换条形水平仪主测量轴，并同步更新读数和气泡位置。
+根据当前界面方向自动切换条形水平仪主测量轴，并同步更新读数与灰色虚线旋转角度。
 
 ### Task 5: Wire Routes Into the Measurement Module
 
@@ -146,5 +148,5 @@ Expected: `BUILD SUCCEEDED`.
 
 确认：
 - 圆形气泡会随设备倾斜移动
-- 条形页在横竖屏切换后仍能正确测量
+- 条形页在横竖屏切换后仍能正确测量，并显示蓝色基准线与灰色虚线测量线
 - 两页返回路径正确，tabBar 隐藏正确

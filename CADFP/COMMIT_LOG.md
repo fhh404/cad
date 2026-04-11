@@ -1,6 +1,110 @@
 # Git 提交日志
 
-## 最新提交 (2026-04-09)
+## 最新提交 (2026-04-10)
+
+### 提交信息
+**Commit:** f37e2b79f111c960dca82783749e323b1b8c3569  
+**作者:** fhh404 <406138227@qq.com>  
+**日期:** Fri Apr 10 18:10:12 2026 +0800
+
+### 提交标题
+feat: 添加工具套件（计算器、测量工具、水印相机）
+
+### 提交详情
+- 实现计算器套件：支持 8 种几何图形计算，提供面积、体积、周长计算
+- 实现测量工具：标尺测量和量角器工具，支持设备注册和几何计算
+- 实现水印相机：支持地理位置水印的相机功能
+- 更新导航架构：重构 ContentView 使用 NavigationStack 和 HomeRoute 路由
+- 添加图标资源和单元测试
+
+### 文件变更统计
+- **64 个文件修改**
+- **6507 行新增**
+- **11 行删除**
+
+### 主要变更文件
+
+#### 新增计算器套件（Calculator）
+- `CalculatorCatalogScreen.swift` - 计算器目录界面（95 行）
+- `CalculatorDetailScreen.swift` - 计算器详情界面（202 行）
+- `CalculatorEngine.swift` - 计算引擎（87 行）
+- `CalculatorFormatting.swift` - 计算格式化（32 行）
+- `CalculatorModels.swift` - 数据模型（240 行）
+- `CalculatorTheme.swift` - 主题样式（44 行）
+
+**支持的几何图形：**
+- 圆柱体（Cylinder）- 总面积、体积
+- 球体（Sphere）- 表面积、体积
+- 立方体（Cube）- 表面积、体积
+- 圆锥（Cone）- 斜面高、曲面表面积、圆锥表面积、体积
+- 三角形（Triangle）- 面积
+- 矩形（Rectangle）- 面积、周长
+- 圆形（Circle）- 面积、周长
+- 梯形（Trapezoid）- 面积
+
+#### 新增测量工具套件（Measurement）
+- `MeasurementCatalogScreen.swift` - 测量工具目录（127 行）
+- `MeasurementModels.swift` - 测量数据模型（72 行）
+- `ProtractorGeometry.swift` - 量角器几何计算（109 行）
+- `ProtractorScreen.swift` - 量角器界面（519 行）
+- `RulerDeviceRegistry.swift` - 标尺设备注册（82 行）
+- `RulerGeometry.swift` - 标尺几何计算（118 行）
+- `RulerScreen.swift` - 标尺界面（369 行）
+
+#### 新增水印相机功能（WatermarkCamera）
+- `WatermarkCameraCapture.swift` - 相机捕获（299 行）
+- `WatermarkCameraScreen.swift` - 水印相机界面（592 行）
+- `WatermarkCameraViewModel.swift` - 视图模型（236 行）
+- `WatermarkLocationService.swift` - 位置服务（144 行）
+- `WatermarkModels.swift` - 水印数据模型（519 行）
+
+#### 新增单元测试
+- `CalculatorEngineTests.swift` - 计算器引擎测试（132 行）
+- `LevelGeometryTests.swift` - 水平仪几何测试（68 行）
+- `ProtractorGeometryTests.swift` - 量角器几何测试（90 行）
+- `RulerGeometryTests.swift` - 标尺几何测试（108 行）
+- `WatermarkModelsTests.swift` - 水印模型测试（196 行）
+
+#### 更新主界面导航
+- `ContentView.swift` - 重构为 NavigationStack + HomeRoute 路由系统（+54 行，-11 行）
+  - 实现 HomeRoute 枚举路由
+  - 支持计算器目录/详情导航
+  - 支持测量工具目录/详情导航
+  - 集成水印相机全屏展示
+
+#### 新增图标资源
+- 几何图形图标（圆柱体、球体、立方体、圆锥、三角形等）
+- 测量工具图标（标尺、量角器）
+- 其他 CAD 功能图标
+
+#### 新增文档
+- `docs/superpowers/plans/2026-04-10-calculator-suite.md` - 计算器套件计划
+- `docs/superpowers/plans/2026-04-10-level-tools.md` - 水平仪工具计划
+- `docs/superpowers/plans/2026-04-10-measurement-tools.md` - 测量工具计划
+- `docs/superpowers/plans/2026-04-10-protractor-camera.md` - 量角器相机计划
+- `docs/superpowers/specs/2026-04-10-calculator-suite-design.md` - 计算器设计规格
+- `docs/superpowers/specs/2026-04-10-level-tools-design.md` - 水平仪设计规格
+- `docs/superpowers/specs/2026-04-10-measurement-tools-design.md` - 测量工具设计规格
+- `docs/superpowers/specs/2026-04-10-protractor-camera-design.md` - 量角器相机设计规格
+
+#### 修改文件
+- `CADFP.xcodeproj/project.pbxproj` - Xcode 项目配置更新（+266 行）
+- `CADFP.xcodeproj/project.xcworkspace/xcuserdata/` - Xcode 用户界面状态
+- `CADFP.xcodeproj/xcshareddata/xcschemes/CADFP.xcscheme` - Xcode 共享方案（114 行）
+
+### 提交说明
+本次提交实现了三大工具套件，大幅丰富了应用功能：
+
+1. **计算器套件**：提供 8 种常见几何图形的面积、体积、周长计算，采用 MVVM 架构，包含完整的输入验证和单元测试
+2. **测量工具**：实现标尺和量角器两种测量工具，支持设备注册和精确几何计算
+3. **水印相机**：支持地理位置水印的相机功能，可拍摄带位置信息的照片
+4. **导航架构升级**：重构主界面使用 NavigationStack 和 HomeRoute 路由系统，支持更复杂的导航场景
+
+这为应用提供了完整的工具生态系统，满足用户在 CAD 设计、测量和文档记录方面的需求。
+
+---
+
+## 上次提交 (2026-04-09)
 
 ### 提交信息
 **Commit:** 60fdb31091bd8d7abb97bdaa2d4d0018f8f5b28e  
@@ -78,7 +182,7 @@ feat: 添加 CAD 查看器桥接功能
 
 ---
 
-## 上次提交 (2026-04-09)
+## 上上次提交 (2026-04-09)
 
 ### 提交信息
 **Commit:** 8c5ac85d82124365f44aea00271155255d7077c0  
