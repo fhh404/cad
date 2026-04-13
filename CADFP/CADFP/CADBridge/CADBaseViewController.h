@@ -10,6 +10,7 @@ typedef NS_ENUM(NSInteger, CADMarkupTool) {
     CADMarkupToolCircle = 1,
     CADMarkupToolCloud = 2,
     CADMarkupToolText = 3,
+    CADMarkupToolHandle = 4,
 };
 
 @class CADBaseViewController;
@@ -37,7 +38,13 @@ typedef NS_ENUM(NSInteger, CADMarkupTool) {
 - (void)requestLayerSnapshot;
 - (void)setLayerHidden:(BOOL)hidden atIndex:(NSInteger)index;
 - (void)activateMarkupTool:(CADMarkupTool)tool;
+- (void)activateTextMarkupWithText:(NSString *)text;
+- (void)activateTextMarkupWithText:(NSString *)text textSize:(double)textSize;
+- (void)setMarkupColorWithRed:(NSInteger)red green:(NSInteger)green blue:(NSInteger)blue;
+- (void)setMarkupLineWeight:(NSInteger)weight;
+- (void)finishActiveMarkup;
 - (void)setMarkupsHidden:(BOOL)hidden;
+- (void)resetView;
 - (void)requestExtractedTexts;
 
 - (void)showMessage:(NSString *)title message:(nullable NSString *)msg;

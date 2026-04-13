@@ -14,7 +14,6 @@ enum HomeAction: String, Identifiable {
     case calculator
     case measurementTools
     case dwgToPdf
-    case modelToStp
     case pdfToDwg
     case pdfToWord
     case pdfToImage
@@ -38,8 +37,6 @@ enum HomeAction: String, Identifiable {
             return "测量工具"
         case .dwgToPdf:
             return "DWG转PDF"
-        case .modelToStp:
-            return "3D转STP"
         case .pdfToDwg:
             return "PDF转DWG"
         case .pdfToWord:
@@ -65,7 +62,7 @@ enum HomeAction: String, Identifiable {
             return "可以独立成相机流程，先做拍照、水印模板和导出。"
         case .calculator, .measurementTools:
             return "工具型入口适合走枚举路由，各自进入独立页面，首页只负责分发。"
-        case .dwgToPdf, .modelToStp, .pdfToDwg, .pdfToWord, .pdfToImage, .dwgToImage, .dwgToDxf:
+        case .dwgToPdf, .pdfToDwg, .pdfToWord, .pdfToImage, .dwgToImage, .dwgToDxf:
             return "文件转换建议统一走同一套任务页和转换引擎，首页只传入转换类型。"
         case .openRecentFile:
             return "最近文件可以先接本地缓存和最近访问记录，后续再接项目同步。"
@@ -103,7 +100,6 @@ struct HomeView: View {
     private let recommendRows: [[RecommendItem]] = [
         [
             .init(title: "DWG转PDF", action: .dwgToPdf, badgeColor: Color(red: 73 / 255, green: 206 / 255, blue: 224 / 255), symbol: "scissors", useTextBadge: false),
-            .init(title: "3D转STP", action: .modelToStp, badgeColor: Color(red: 247 / 255, green: 169 / 255, blue: 56 / 255), symbol: "cube.fill", useTextBadge: false),
             .init(title: "PDF转DWG", action: .pdfToDwg, badgeColor: Color(red: 255 / 255, green: 108 / 255, blue: 133 / 255), symbol: "plus", useTextBadge: false),
             .init(title: "PDF转Word", action: .pdfToWord, badgeColor: Color(red: 64 / 255, green: 110 / 255, blue: 255 / 255), symbol: "W", useTextBadge: true)
         ],
@@ -356,11 +352,6 @@ private struct RecommendSection: View {
                     HStack(alignment: .top, spacing: 14) {
                         ForEach(row) { item in
                             RecommendationButton(item: item, action: { onAction(item.action) })
-                                .frame(maxWidth: .infinity)
-                        }
-
-                        if index == 1 {
-                            Spacer(minLength: 0)
                                 .frame(maxWidth: .infinity)
                         }
                     }

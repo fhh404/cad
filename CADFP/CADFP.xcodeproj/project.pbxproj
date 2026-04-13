@@ -57,6 +57,9 @@
 		BF200012AA110001CC120001 /* LevelMotionEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF200012AA110001CC120001 /* LevelMotionEngine.swift */; };
 		BF200013AA110001CC120001 /* CircularLevelScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF200013AA110001CC120001 /* CircularLevelScreen.swift */; };
 		BF200014AA110001CC120001 /* BarLevelScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF200014AA110001CC120001 /* BarLevelScreen.swift */; };
+		BFC0D001AA220001CC120001 /* CADConversionEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFC0D001AA220001CC120001 /* CADConversionEngine.swift */; };
+		BFC0D002AA220001CC120001 /* CADConversionBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = CFC0D003AA220001CC120001 /* CADConversionBridge.mm */; };
+		CAD00002AA330001CC120001 /* CADViewerToolbarItemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAD00001AA330001CC120001 /* CADViewerToolbarItemTests.swift */; };
 		C3BCC5E8320748CD3756730B /* WatermarkCameraScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D689C8914AE5DA6CB897AF8 /* WatermarkCameraScreen.swift */; };
 		C910362D9039E664808D35AD /* TviProgressMeter.mm in Sources */ = {isa = PBXBuildFile; fileRef = CEB1738F6356C259E0C53178 /* TviProgressMeter.mm */; };
 		E6CAE09C6E9B9967FB27329F /* TviDraggers.mm in Sources */ = {isa = PBXBuildFile; fileRef = F3FB2A599F66FA2A0973B1A5 /* TviDraggers.mm */; };
@@ -116,7 +119,9 @@
 		A62BA8C24C2E8C43EEA2A601 /* WatermarkCameraCapture.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WatermarkCameraCapture.swift; sourceTree = "<group>"; };
 		B18D05F6DAF35CCA52FE2BAC /* CADFPTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CADFPTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B2931A55DC6712E1DAFC7F4C /* TviActivator.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; path = TviActivator.cpp; sourceTree = "<group>"; };
+		B7F10000AA110001CC120001 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C8BAEA4D68A9F046D0EC266D /* ConversionScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ConversionScreen.swift; sourceTree = "<group>"; };
+		CAD00001AA330001CC120001 /* CADViewerToolbarItemTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CADViewerToolbarItemTests.swift; path = CADFPTests/CADViewerToolbarItemTests.swift; sourceTree = "<group>"; };
 		CB75FB1333EAFBFF2463AD38 /* CADEngineBootstrap.mm */ = {isa = PBXFileReference; includeInIndex = 1; path = CADEngineBootstrap.mm; sourceTree = "<group>"; };
 		CDA978F1BECAF3CB17E61FF0 /* TviAxisControl.hpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.h; path = TviAxisControl.hpp; sourceTree = "<group>"; };
 		CEB1738F6356C259E0C53178 /* TviProgressMeter.mm */ = {isa = PBXFileReference; includeInIndex = 1; path = TviProgressMeter.mm; sourceTree = "<group>"; };
@@ -141,6 +146,9 @@
 		CF200012AA110001CC120001 /* LevelMotionEngine.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LevelMotionEngine.swift; sourceTree = "<group>"; };
 		CF200013AA110001CC120001 /* CircularLevelScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CircularLevelScreen.swift; sourceTree = "<group>"; };
 		CF200014AA110001CC120001 /* BarLevelScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BarLevelScreen.swift; sourceTree = "<group>"; };
+		CFC0D001AA220001CC120001 /* CADConversionEngine.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CADConversionEngine.swift; sourceTree = "<group>"; };
+		CFC0D002AA220001CC120001 /* CADConversionBridge.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CADConversionBridge.h; sourceTree = "<group>"; };
+		CFC0D003AA220001CC120001 /* CADConversionBridge.mm */ = {isa = PBXFileReference; includeInIndex = 1; path = CADConversionBridge.mm; sourceTree = "<group>"; };
 		D18227E519CB6846BBDB626D /* CADBaseViewController.mm */ = {isa = PBXFileReference; includeInIndex = 1; path = CADBaseViewController.mm; sourceTree = "<group>"; };
 		D1C68E6882910B9E4837D6C7 /* ConversionDocumentStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ConversionDocumentStore.swift; sourceTree = "<group>"; };
 		DC60B757231C53E7B499A1AE /* TviGlobalParameters.hpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.h; path = TviGlobalParameters.hpp; sourceTree = "<group>"; };
@@ -181,6 +189,8 @@
 				8323A47578BF32E865D289E1 /* AppUITools */,
 				5475C459C40EEE951DE57460 /* CADBaseViewController.h */,
 				D18227E519CB6846BBDB626D /* CADBaseViewController.mm */,
+				CFC0D002AA220001CC120001 /* CADConversionBridge.h */,
+				CFC0D003AA220001CC120001 /* CADConversionBridge.mm */,
 				EA44A5AB9B6B0F590B1BB492 /* CADEngineBootstrap.h */,
 				CB75FB1333EAFBFF2463AD38 /* CADEngineBootstrap.mm */,
 				55713757129A941F6ACE5705 /* CADLayerItem.h */,
@@ -227,6 +237,7 @@
 		48A740662F8789EA00465BAE /* CADFP */ = {
 			isa = PBXGroup;
 			children = (
+				B7F10000AA110001CC120001 /* Info.plist */,
 				48A740632F8789EA00465BAE /* Assets.xcassets */,
 				4877ED752F87B49E005709DC /* Sample.dwg */,
 				48A740642F8789EA00465BAE /* CADFPApp.swift */,
@@ -282,6 +293,7 @@
 			children = (
 				56A1F11F4D51CFFCAAF164F5 /* ConversionModels.swift */,
 				D1C68E6882910B9E4837D6C7 /* ConversionDocumentStore.swift */,
+				CFC0D001AA220001CC120001 /* CADConversionEngine.swift */,
 				C8BAEA4D68A9F046D0EC266D /* ConversionScreen.swift */,
 			);
 			name = Conversion;
@@ -351,6 +363,7 @@
 				CF200010AA110001CC120001 /* LevelGeometryTests.swift */,
 				FD0D3FAF88DB8146F8A85763 /* WatermarkModelsTests.swift */,
 				595C0E7A9F688C3D3D6E7B74 /* ConversionDocumentStoreTests.swift */,
+				CAD00001AA330001CC120001 /* CADViewerToolbarItemTests.swift */,
 			);
 			name = CADFPTests;
 			sourceTree = "<group>";
@@ -497,6 +510,7 @@
 				5BA54139AF5E5A7392C00025 /* CADBaseViewController.mm in Sources */,
 				75BC06228B156ABFB6571563 /* CADEngineBootstrap.mm in Sources */,
 				4E039D043BB8643B3DED18B6 /* CADLayerItem.m in Sources */,
+				BFC0D002AA220001CC120001 /* CADConversionBridge.mm in Sources */,
 				0E6232669D8A04CE92D25D85 /* RenderViewController.mm in Sources */,
 				00D0825C9744B12E1FDEA62C /* CADViewerBridgeView.swift in Sources */,
 				98864A387D710A2F7BB44A1F /* CADViewerScreen.swift in Sources */,
@@ -508,6 +522,7 @@
 				C3BCC5E8320748CD3756730B /* WatermarkCameraScreen.swift in Sources */,
 				B962E3A1177DF5F4BF429DB3 /* ConversionModels.swift in Sources */,
 				0AFF772898C2507F57FF0038 /* ConversionDocumentStore.swift in Sources */,
+				BFC0D001AA220001CC120001 /* CADConversionEngine.swift in Sources */,
 				F924313300DDF779BA96376D /* ConversionScreen.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -522,6 +537,7 @@
 				BF200010AA110001CC120001 /* LevelGeometryTests.swift in Sources */,
 				4A563EA5DF2602C2898322E4 /* WatermarkModelsTests.swift in Sources */,
 				939DDBE22D43599A43620D04 /* ConversionDocumentStoreTests.swift in Sources */,
+				CAD00002AA330001CC120001 /* CADViewerToolbarItemTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -719,7 +735,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = S2Y932A6FY;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/可视化真机/KernelBase/Include",
@@ -729,6 +745,10 @@
 					"$(SRCROOT)/可视化真机/Visualize/Include",
 					"$(SRCROOT)/可视化真机/Visualize/Core/Include",
 					"$(SRCROOT)/可视化真机/Kernel/Include",
+					"$(SRCROOT)/可视化真机/Drawing/Imports/PdfImport/Include",
+					"$(SRCROOT)/可视化真机/Kernel/Exports/PdfExport/Include",
+					"$(SRCROOT)/可视化真机/Kernel/Exports/PdfExport/PDFToolkit",
+					"$(SRCROOT)/可视化真机/Kernel/Exports/RasterExport/Include",
 					"$(SRCROOT)/可视化真机/Drawing/Include",
 				);
 				INFOPLIST_KEY_NSCameraUsageDescription = "用于拍摄施工现场、进行量角器测量并生成带水印的记录照片";
@@ -739,6 +759,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_FILE = CADFP/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -852,6 +873,13 @@
 					"-lDwg2Visualize",
 					"-lObj2Visualize",
 					"-lExVisualizeDevice",
+					"-lTD_PdfImport",
+					"-lTD_PdfExport",
+					"-lTD_PDFToolkit",
+					"-lTD_RasterExport",
+					"-lqpdf",
+					"-lpcre",
+					"-lstsflib",
 					"-lTD_Pdfium",
 					"-lPDFiumModule",
 					"-lDbCryptModule",
@@ -882,7 +910,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = S2Y932A6FY;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/可视化真机/KernelBase/Include",
@@ -892,6 +920,10 @@
 					"$(SRCROOT)/可视化真机/Visualize/Include",
 					"$(SRCROOT)/可视化真机/Visualize/Core/Include",
 					"$(SRCROOT)/可视化真机/Kernel/Include",
+					"$(SRCROOT)/可视化真机/Drawing/Imports/PdfImport/Include",
+					"$(SRCROOT)/可视化真机/Kernel/Exports/PdfExport/Include",
+					"$(SRCROOT)/可视化真机/Kernel/Exports/PdfExport/PDFToolkit",
+					"$(SRCROOT)/可视化真机/Kernel/Exports/RasterExport/Include",
 					"$(SRCROOT)/可视化真机/Drawing/Include",
 				);
 				INFOPLIST_KEY_NSCameraUsageDescription = "用于拍摄施工现场、进行量角器测量并生成带水印的记录照片";
@@ -902,6 +934,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_FILE = CADFP/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1015,6 +1048,13 @@
 					"-lDwg2Visualize",
 					"-lObj2Visualize",
 					"-lExVisualizeDevice",
+					"-lTD_PdfImport",
+					"-lTD_PdfExport",
+					"-lTD_PDFToolkit",
+					"-lTD_RasterExport",
+					"-lqpdf",
+					"-lpcre",
+					"-lstsflib",
 					"-lTD_Pdfium",
 					"-lPDFiumModule",
 					"-lDbCryptModule",

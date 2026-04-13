@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import UniformTypeIdentifiers
 
 enum ConversionKind: String, CaseIterable, Codable, Hashable, Identifiable {
     case dwgToPdf
@@ -95,6 +96,42 @@ enum ConversionKind: String, CaseIterable, Codable, Hashable, Identifiable {
             return Color(red: 39 / 255, green: 204 / 255, blue: 122 / 255)
         }
     }
+
+    var importContentTypes: [UTType] {
+        switch self {
+        case .dwgToPdf, .dwgToImage, .dwgToDxf:
+            return [.cadFileType("dwg")]
+        case .modelToStp:
+            return [
+                .cadFileType("obj"),
+                .cadFileType("stl"),
+                .cadFileType("step"),
+                .cadFileType("stp"),
+                .cadFileType("iges"),
+                .cadFileType("igs")
+            ]
+        case .pdfToDwg, .pdfToWord, .pdfToImage:
+            return [.pdf]
+        }
+    }
+
+    static func preferredImportKind(for url: URL) -> ConversionKind? {
+        switch url.pathExtension.lowercased() {
+        case "pdf":
+            return .pdfToDwg
+        case "dwg":
+            return .dwgToPdf
+        case "dxf":
+            return .dwgToDxf
+        default:
+            return nil
+        }
+    }
+}
+
+enum ConversionDocumentPreviewDestination: Hashable {
+    case cadViewer
+    case systemPreview
 }
 
 struct ConversionDocument: Codable, Hashable, Identifiable {
@@ -112,6 +149,19 @@ struct ConversionDocument: Codable, Hashable, Identifiable {
     func fileURL(relativeTo baseDirectory: URL) -> URL {
         baseDirectory.appendingPathComponent(relativePath, isDirectory: false)
     }
+
+    var previewDestination: ConversionDocumentPreviewDestination {
+        switch fileName.pathExtensionLowercased {
+        case "dwg", "dxf":
+            return .cadViewer
+        default:
+            return .systemPreview
+        }
+    }
+
+    var isConvertedOutput: Bool {
+        fileName.pathExtensionLowercased == kind.outputExtension
+    }
 }
 
 extension HomeAction {
@@ -119,8 +169,6 @@ extension HomeAction {
         switch self {
         case .dwgToPdf:
             return .dwgToPdf
-        case .modelToStp:
-            return .modelToStp
         case .pdfToDwg:
             return .pdfToDwg
         case .pdfToWord:
@@ -134,5 +182,17 @@ extension HomeAction {
         default:
             return nil
         }
+    }
+}
+
+private extension UTType {
+    static func cadFileType(_ fileExtension: String) -> UTType {
+        UTType(filenameExtension: fileExtension) ?? .data
+    }
+}
+
+private extension String {
+    var pathExtensionLowercased: String {
+        (self as NSString).pathExtension.lowercased()
     }
 }

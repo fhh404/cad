@@ -222,6 +222,16 @@ void TviCore::setSettingLinesColor(TviCore::DrawLinesColor linesColorIndex)
     }
 }
 
+void TviCore::setSettingLinesColorRGB(OdUInt8 red, OdUInt8 green, OdUInt8 blue)
+{
+    linesColor = OdTvColorDef(red, green, blue);
+}
+
+void TviCore::setSettingLinesWeight(OdUInt8 weight)
+{
+    linesWeight = weight < 1 ? 1 : weight;
+}
+
 void TviCore::release()
 {
     if(!m_TvDatabaseId.isNull())
@@ -844,7 +854,7 @@ void TviCore::cleanLastMarks()
 
 
         m_TvMarkupsModelId =  pDatabase->createModel(mname, OdTvModel::kDirect, false);
-        OdTvDraggerPtr pNewDragger  = new OdTvRectangleMarkupDragger(m_TvDeviceId, m_TvMarkupsModelId, m_appTvId, linesColor, 3);;
+        OdTvDraggerPtr pNewDragger  = new OdTvRectangleMarkupDragger(m_TvDeviceId, m_TvMarkupsModelId, m_appTvId, linesColor, linesWeight);;
         startDragger(pNewDragger);
         TviCore::finishDragger();
         linesFlag--;
@@ -869,7 +879,7 @@ void TviCore::cleanMarks()
 
  
         m_TvMarkupsModelId =  pDatabase->createModel(mname, OdTvModel::kDirect, false);
-        OdTvDraggerPtr pNewDragger  = new OdTvRectangleMarkupDragger(m_TvDeviceId, m_TvMarkupsModelId, m_appTvId, linesColor, 3);;
+        OdTvDraggerPtr pNewDragger  = new OdTvRectangleMarkupDragger(m_TvDeviceId, m_TvMarkupsModelId, m_appTvId, linesColor, linesWeight);;
         startDragger(pNewDragger);
         TviCore::finishDragger();
 
@@ -914,19 +924,19 @@ void TviCore::runMarkupAction(TviCore::MarkupAction act)
     switch (act)
     {
         case Rectangle:
-            pNewDragger = new OdTvRectangleMarkupDragger(m_TvDeviceId, m_TvMarkupsModelId, m_appTvId, linesColor, 3);
+            pNewDragger = new OdTvRectangleMarkupDragger(m_TvDeviceId, m_TvMarkupsModelId, m_appTvId, linesColor, linesWeight);
             break;
         case Circle:
-            pNewDragger = new OdTvCircleMarkupDragger(m_TvDeviceId, m_TvMarkupsModelId, m_appTvId, linesColor, 3);
+            pNewDragger = new OdTvCircleMarkupDragger(m_TvDeviceId, m_TvMarkupsModelId, m_appTvId, linesColor, linesWeight);
             break;
         case Handle:
-            pNewDragger = new OdTvHandleMarkupDragger(m_TvDeviceId, m_TvMarkupsModelId, m_appTvId, linesColor, 3);
+            pNewDragger = new OdTvHandleMarkupDragger(m_TvDeviceId, m_TvMarkupsModelId, m_appTvId, linesColor, linesWeight);
             break;
         case Cloud:
-            pNewDragger = new OdTvCloudMarkupDragger(m_TvDeviceId, m_TvMarkupsModelId, m_appTvId, linesColor, 3);
+            pNewDragger = new OdTvCloudMarkupDragger(m_TvDeviceId, m_TvMarkupsModelId, m_appTvId, linesColor, linesWeight);
             break;
         case Text:
-            pNewDragger = new OdTvTextMarkupDragger(m_TvDeviceId, m_TvMarkupsModelId, m_appTvId, linesColor, 3);
+            pNewDragger = new OdTvTextMarkupDragger(m_TvDeviceId, m_TvMarkupsModelId, m_appTvId, linesColor, linesWeight);
             break;
         case Save:
         {

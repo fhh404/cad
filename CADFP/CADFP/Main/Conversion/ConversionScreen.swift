@@ -1,42 +1,115 @@
+import QuickLook
 import SwiftUI
+import UIKit
+
+enum ConversionScreenLayout {
+    static let designWidth: CGFloat = 393
+    static let designHeight: CGFloat = 852
+    static let headerTop: CGFloat = 125
+    static let importCardsTop: CGFloat = 233
+    static let documentsPanelTop: CGFloat = 409
+    static let documentsPanelHeight: CGFloat = 443
+    static let horizontalMargin: CGFloat = 20
+    static let documentTitleLeading: CGFloat = 24
+}
 
 struct ConversionScreen: View {
-    @Environment(\.dismiss) private var dismiss
-
     let kind: ConversionKind
-    let onConverted: (ConversionKind) -> Void
+    let incomingFileURL: URL?
+    let onConverted: (ConversionDocument) -> Void
+    let onOpenDocument: (ConversionDocument) -> Void
 
     @State private var documents: [ConversionDocument] = []
     @State private var alertMessage: ConversionAlert?
+    @State private var activeSheet: ConversionSheet?
+    @State private var showsFileImporter = false
+    @State private var handledIncomingFileURL: URL?
 
     private let store = ConversionDocumentStore()
 
+    init(
+        kind: ConversionKind,
+        incomingFileURL: URL? = nil,
+        onConverted: @escaping (ConversionDocument) -> Void,
+        onOpenDocument: @escaping (ConversionDocument) -> Void
+    ) {
+        self.kind = kind
+        self.incomingFileURL = incomingFileURL
+        self.onConverted = onConverted
+        self.onOpenDocument = onOpenDocument
+    }
+
     var body: some View {
-        ZStack(alignment: .top) {
-            ConversionBackdrop()
+        GeometryReader { proxy in
+            let pageWidth = min(proxy.size.width, ConversionScreenLayout.designWidth)
+            let pageX = max((proxy.size.width - pageWidth) / 2, 0)
+            let panelHeight = max(
+                proxy.size.height - ConversionScreenLayout.documentsPanelTop,
+                ConversionScreenLayout.documentsPanelHeight
+            )
 
-            ScrollView {
-                VStack(alignment: .leading, spacing: 0) {
-                    header
-                        .padding(.top, 118)
+            ZStack(alignment: .topLeading) {
+                ConversionBackdrop()
 
-                    importCards
-                        .padding(.top, 26)
+                RoundedRectangle(cornerRadius: 28, style: .continuous)
+                    .fill(.white)
+                    .frame(width: pageWidth, height: panelHeight)
+                    .offset(x: pageX, y: ConversionScreenLayout.documentsPanelTop)
 
-                    documentsPanel
-                        .padding(.top, 24)
-                }
-                .padding(.horizontal, 20)
-                .padding(.bottom, 48)
+                header
+                    .frame(
+                        width: pageWidth - ConversionScreenLayout.horizontalMargin * 2,
+                        alignment: .leading
+                    )
+                    .offset(
+                        x: pageX + ConversionScreenLayout.horizontalMargin,
+                        y: ConversionScreenLayout.headerTop
+                    )
+
+                importCards
+                    .frame(width: 353, height: 152, alignment: .topLeading)
+                    .offset(
+                        x: pageX + ConversionScreenLayout.horizontalMargin,
+                        y: ConversionScreenLayout.importCardsTop
+                    )
+
+                documentsPanel
+                    .frame(width: pageWidth, height: panelHeight, alignment: .topLeading)
+                    .offset(x: pageX, y: ConversionScreenLayout.documentsPanelTop)
+
             }
-            .scrollIndicators(.hidden)
-
-            ConversionNavigationBar(title: kind.title, onBack: { dismiss() })
+            .frame(width: proxy.size.width, height: proxy.size.height, alignment: .topLeading)
         }
-        .toolbar(.hidden, for: .navigationBar)
+        .ignoresSafeArea()
+        .navigationTitle(kind.title)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar(.hidden, for: .tabBar)
         .background(Color.white)
         .task {
             reloadDocuments()
+        }
+        .task(id: incomingFileURL) {
+            importIncomingFileIfNeeded()
+        }
+        .fileImporter(
+            isPresented: $showsFileImporter,
+            allowedContentTypes: kind.importContentTypes,
+            allowsMultipleSelection: false,
+            onCompletion: handleFileImporterResult
+        )
+        .sheet(item: $activeSheet) { sheet in
+            switch sheet {
+            case .importedFiles:
+                ConversionImportedFilesSheet(
+                    kind: kind,
+                    documents: documents,
+                    onOpenDocument: onOpenDocument
+                )
+                    .presentationDetents([.medium, .large])
+            case .weChatGuide:
+                ConversionWeChatGuideSheet()
+                    .presentationDetents([.medium])
+            }
         }
         .alert(item: $alertMessage) { alert in
             Alert(
@@ -68,8 +141,9 @@ struct ConversionScreen: View {
         HStack(spacing: 12) {
             Button {
                 reloadDocuments()
+                activeSheet = .importedFiles
             } label: {
-                VStack(spacing: 20) {
+                VStack(spacing: 22) {
                     ZStack {
                         Circle()
                             .fill(Color(red: 239 / 255, green: 244 / 255, blue: 1))
@@ -84,7 +158,10 @@ struct ConversionScreen: View {
                     Text("我的文件")
                         .font(.system(size: 16, weight: .bold))
                         .foregroundStyle(.black)
+
+                    Spacer(minLength: 0)
                 }
+                .padding(.top, 24)
                 .frame(width: 157, height: 152)
                 .background(.white, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
             }
@@ -96,7 +173,7 @@ struct ConversionScreen: View {
                     background: Color(red: 230 / 255, green: 252 / 255, blue: 1),
                     imageName: "本地文件 (1) 1",
                     iconColor: nil,
-                    action: runMockConversion
+                    action: { showsFileImporter = true }
                 )
 
                 ConversionImportOptionCard(
@@ -104,7 +181,7 @@ struct ConversionScreen: View {
                     background: Color(red: 230 / 255, green: 1, blue: 246 / 255),
                     imageName: nil,
                     iconColor: Color(red: 38 / 255, green: 214 / 255, blue: 134 / 255),
-                    action: runMockConversion
+                    action: { activeSheet = .weChatGuide }
                 )
             }
         }
@@ -115,36 +192,80 @@ struct ConversionScreen: View {
             Text("我的文档")
                 .font(.system(size: 16, weight: .bold))
                 .foregroundStyle(.black)
+                .padding(.leading, ConversionScreenLayout.documentTitleLeading)
 
             if documents.isEmpty {
                 ConversionEmptyDocumentView(kind: kind)
                     .padding(.top, 22)
-            } else {
-                VStack(spacing: 22) {
-                    ForEach(documents) { document in
-                        ConversionDocumentRow(document: document)
-                    }
-                }
-            }
 
-            Spacer(minLength: 0)
+                Spacer(minLength: 0)
+            } else {
+                ScrollView {
+                    LazyVStack(spacing: 22) {
+                        ForEach(documents) { document in
+                            Button {
+                                onOpenDocument(document)
+                            } label: {
+                                ConversionDocumentRow(document: document)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                    .padding(.bottom, 24)
+                }
+                .scrollIndicators(.hidden)
+            }
         }
-        .padding(.horizontal, 4)
         .padding(.top, 24)
-        .frame(maxWidth: .infinity, minHeight: 420, alignment: .topLeading)
-        .background(.white, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
-        .padding(.horizontal, -20)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
 
-    private func runMockConversion() {
+    private func handleFileImporterResult(_ result: Result<[URL], Error>) {
+        switch result {
+        case let .success(urls):
+            guard let url = urls.first else { return }
+            importDocument(at: url)
+        case let .failure(error):
+            let nsError = error as NSError
+            guard nsError.domain != NSCocoaErrorDomain || nsError.code != NSUserCancelledError else {
+                return
+            }
+
+            alertMessage = ConversionAlert(
+                title: "导入失败",
+                message: "没有成功选择文件，请再试一次。"
+            )
+        }
+    }
+
+    private func importIncomingFileIfNeeded() {
+        guard let incomingFileURL, handledIncomingFileURL != incomingFileURL else {
+            return
+        }
+
+        handledIncomingFileURL = incomingFileURL
+        importDocument(at: incomingFileURL)
+    }
+
+    private func importDocument(at url: URL) {
         do {
-            _ = try store.saveConvertedPlaceholder(kind: kind)
+            let outputURL = try CADConversionEngine.convert(sourceURL: url, kind: kind)
+            let document = try store.saveConvertedFile(
+                at: outputURL,
+                kind: kind,
+                sourceName: url.lastPathComponent
+            )
             reloadDocuments()
-            onConverted(kind)
+            onConverted(document)
+        } catch CADConversionEngine.ConversionError.unsupported {
+            alertMessage = ConversionAlert(
+                title: "暂不支持",
+                message: "\(kind.title) 本地转换还没有接入。"
+            )
         } catch {
             alertMessage = ConversionAlert(
-                title: "保存失败",
-                message: "占位转换文件没有保存成功，请稍后再试。"
+                title: "转换失败",
+                message: error.localizedDescription
             )
         }
     }
@@ -154,18 +275,166 @@ struct ConversionScreen: View {
     }
 }
 
-struct ConversionCompleteScreen: View {
+private enum ConversionSheet: Identifiable {
+    case importedFiles
+    case weChatGuide
+
+    var id: String {
+        switch self {
+        case .importedFiles:
+            return "importedFiles"
+        case .weChatGuide:
+            return "weChatGuide"
+        }
+    }
+}
+
+private struct ConversionImportedFilesSheet: View {
     @Environment(\.dismiss) private var dismiss
 
     let kind: ConversionKind
+    let documents: [ConversionDocument]
+    let onOpenDocument: (ConversionDocument) -> Void
+
+    var body: some View {
+        NavigationStack {
+            Group {
+                if documents.isEmpty {
+                    VStack(spacing: 14) {
+                        ConversionFileIcon(extensionText: kind.outputExtension.uppercased())
+                            .frame(width: 52, height: 52)
+                            .opacity(0.72)
+
+                        Text("暂无转换文件")
+                            .font(.system(size: 16, weight: .bold))
+                            .foregroundStyle(.black)
+
+                        Text("转换完成后的文件会自动保存到这里。")
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundStyle(Color(red: 153 / 255, green: 153 / 255, blue: 153 / 255))
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .padding(.horizontal, 24)
+                } else {
+                    ScrollView {
+                        LazyVStack(spacing: 22) {
+                            ForEach(documents) { document in
+                                Button {
+                                    dismiss()
+                                    onOpenDocument(document)
+                                } label: {
+                                    ConversionDocumentRow(document: document)
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                        .padding(.vertical, 20)
+                    }
+                    .scrollIndicators(.hidden)
+                }
+            }
+            .navigationTitle("我的文件")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("完成") {
+                        dismiss()
+                    }
+                    .font(.system(size: 15, weight: .semibold))
+                }
+            }
+        }
+    }
+}
+
+private struct ConversionWeChatGuideSheet: View {
+    @Environment(\.dismiss) private var dismiss
+
+    private var appName: String {
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String
+            ?? Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String
+            ?? "CADFP"
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 20) {
+            Capsule()
+                .fill(Color(red: 219 / 255, green: 226 / 255, blue: 235 / 255))
+                .frame(width: 40, height: 5)
+                .frame(maxWidth: .infinity)
+                .padding(.top, 10)
+
+            VStack(alignment: .leading, spacing: 10) {
+                Text("微信导入")
+                    .font(.system(size: 20, weight: .bold))
+                    .foregroundStyle(.black)
+
+                Text("请在微信聊天里打开要转换的文件，点右上角更多，选择“用其他应用打开”，再选择\(appName)。回到\(appName)后会自动进入转换页并保存到我的文件。")
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundStyle(Color(red: 80 / 255, green: 88 / 255, blue: 102 / 255))
+                    .lineSpacing(6)
+            }
+
+            VStack(alignment: .leading, spacing: 12) {
+                ConversionGuideStep(number: "1", text: "微信聊天文件")
+                ConversionGuideStep(number: "2", text: "用其他应用打开")
+                ConversionGuideStep(number: "3", text: "选择\(appName)")
+            }
+
+            Spacer(minLength: 0)
+
+            Button {
+                dismiss()
+            } label: {
+                Text("知道了")
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity, minHeight: 50)
+                    .background(Color(red: 35 / 255, green: 99 / 255, blue: 254 / 255), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(.horizontal, 24)
+        .padding(.bottom, 22)
+        .background(Color.white)
+    }
+}
+
+private struct ConversionGuideStep: View {
+    let number: String
+    let text: String
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Text(number)
+                .font(.system(size: 12, weight: .bold))
+                .foregroundStyle(.white)
+                .frame(width: 24, height: 24)
+                .background(Color(red: 35 / 255, green: 99 / 255, blue: 254 / 255), in: Circle())
+
+            Text(text)
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundStyle(Color(red: 22 / 255, green: 22 / 255, blue: 22 / 255))
+
+            Spacer(minLength: 0)
+        }
+    }
+}
+
+struct ConversionCompleteScreen: View {
+    let document: ConversionDocument
     let onReturnHome: () -> Void
 
     @State private var alertMessage: ConversionAlert?
+    @State private var exportDocument: ConversionDocument?
+
+    private var kind: ConversionKind {
+        document.kind
+    }
 
     var body: some View {
         ZStack(alignment: .top) {
             Color.white.ignoresSafeArea()
-
             VStack(spacing: 0) {
                 Spacer()
                     .frame(height: 174)
@@ -187,7 +456,12 @@ struct ConversionCompleteScreen: View {
 
                 VStack(spacing: 20) {
                     Button {
-                        alertMessage = ConversionAlert(title: "下载", message: "真实下载功能会在转换引擎接入后补上。")
+                        guard FileManager.default.fileExists(atPath: document.fileURL.path) else {
+                            alertMessage = ConversionAlert(title: "文件不存在", message: "没有找到转换后的文件，请重新转换一次。")
+                            return
+                        }
+
+                        exportDocument = document
                     } label: {
                         Text("下载")
                             .font(.system(size: 16, weight: .bold))
@@ -197,16 +471,13 @@ struct ConversionCompleteScreen: View {
                     }
                     .buttonStyle(.plain)
 
-                    Button {
-                        alertMessage = ConversionAlert(title: "分享至", message: "真实分享功能会在转换文件可用后补上。")
-                    } label: {
+                    ShareLink(item: document.fileURL) {
                         Text("分享至")
                             .font(.system(size: 16, weight: .bold))
                             .foregroundStyle(Color(red: 22 / 255, green: 22 / 255, blue: 22 / 255))
                             .frame(maxWidth: .infinity, minHeight: 50)
                             .background(Color(red: 243 / 255, green: 246 / 255, blue: 250 / 255), in: Capsule())
                     }
-                    .buttonStyle(.plain)
                 }
                 .padding(.horizontal, 44)
                 .padding(.top, 48)
@@ -221,10 +492,13 @@ struct ConversionCompleteScreen: View {
 
                 Spacer()
             }
-
-            ConversionNavigationBar(title: "转换完成", onBack: { dismiss() })
         }
-        .toolbar(.hidden, for: .navigationBar)
+        .navigationTitle("转换完成")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar(.hidden, for: .tabBar)
+        .sheet(item: $exportDocument) { document in
+            ConversionDocumentExporter(url: document.fileURL)
+        }
         .alert(item: $alertMessage) { alert in
             Alert(
                 title: Text(alert.title),
@@ -235,30 +509,60 @@ struct ConversionCompleteScreen: View {
     }
 }
 
-private struct ConversionNavigationBar: View {
-    let title: String
-    let onBack: () -> Void
+struct ConversionFilePreviewScreen: View {
+    let document: ConversionDocument
 
     var body: some View {
-        ZStack {
-            Button(action: onBack) {
-                Image("Group 189")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 20, height: 20)
-                    .frame(width: 44, height: 44, alignment: .leading)
-            }
-            .buttonStyle(.plain)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.leading, 16)
+        QuickLookPreview(url: document.fileURL)
+            .ignoresSafeArea()
+            .navigationTitle(document.fileName)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar(.hidden, for: .tabBar)
+    }
+}
 
-            Text(title)
-                .font(.system(size: 18, weight: .bold))
-                .foregroundStyle(Color(red: 22 / 255, green: 22 / 255, blue: 22 / 255))
+private struct ConversionDocumentExporter: UIViewControllerRepresentable {
+    let url: URL
+
+    func makeUIViewController(context: Context) -> UIDocumentPickerViewController {
+        UIDocumentPickerViewController(forExporting: [url], asCopy: true)
+    }
+
+    func updateUIViewController(_ uiViewController: UIDocumentPickerViewController, context: Context) {}
+}
+
+private struct QuickLookPreview: UIViewControllerRepresentable {
+    let url: URL
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(url: url)
+    }
+
+    func makeUIViewController(context: Context) -> QLPreviewController {
+        let controller = QLPreviewController()
+        controller.dataSource = context.coordinator
+        return controller
+    }
+
+    func updateUIViewController(_ uiViewController: QLPreviewController, context: Context) {}
+
+    final class Coordinator: NSObject, QLPreviewControllerDataSource {
+        let url: URL
+
+        init(url: URL) {
+            self.url = url
         }
-        .frame(height: 52)
-        .padding(.top, 44)
-        .background(Color.white.opacity(0.001))
+
+        func numberOfPreviewItems(in controller: QLPreviewController) -> Int {
+            FileManager.default.fileExists(atPath: url.path) ? 1 : 0
+        }
+
+        func previewController(
+            _ controller: QLPreviewController,
+            previewItemAt index: Int
+        ) -> QLPreviewItem {
+            url as NSURL
+        }
     }
 }
 
@@ -464,6 +768,10 @@ private extension Date {
 
 #Preview {
     NavigationStack {
-        ConversionScreen(kind: .pdfToDwg, onConverted: { _ in })
+        ConversionScreen(
+            kind: .pdfToDwg,
+            onConverted: { _ in },
+            onOpenDocument: { _ in }
+        )
     }
 }

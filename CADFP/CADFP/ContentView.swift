@@ -22,13 +22,16 @@ enum HomeRoute: Hashable {
     case measurementRuler
     case measurementProtractor
     case conversion(ConversionKind)
-    case conversionComplete(ConversionKind)
+    case importedConversion(ConversionKind, URL)
+    case conversionComplete(ConversionDocument)
+    case conversionDocumentPreview(ConversionDocument)
 }
 
 struct ContentView: View {
     @State private var selectedTab: AppTab = .home
     @State private var homePath: [HomeRoute] = []
     @State private var pendingAction: HomeAction?
+    @State private var externalImportAlert: ConversionAlert?
     @State private var showsWatermarkCamera = false
 
     var body: some View {
@@ -74,12 +77,36 @@ struct ContentView: View {
                     case .measurementProtractor:
                         ProtractorScreen()
                     case let .conversion(kind):
-                        ConversionScreen(kind: kind) { convertedKind in
-                            homePath.append(.conversionComplete(convertedKind))
-                        }
-                    case let .conversionComplete(kind):
-                        ConversionCompleteScreen(kind: kind) {
+                        ConversionScreen(
+                            kind: kind,
+                            onConverted: { document in
+                                homePath.append(.conversionComplete(document))
+                            },
+                            onOpenDocument: { document in
+                                homePath.append(.conversionDocumentPreview(document))
+                            }
+                        )
+                    case let .importedConversion(kind, url):
+                        ConversionScreen(
+                            kind: kind,
+                            incomingFileURL: url,
+                            onConverted: { document in
+                                homePath.append(.conversionComplete(document))
+                            },
+                            onOpenDocument: { document in
+                                homePath.append(.conversionDocumentPreview(document))
+                            }
+                        )
+                    case let .conversionComplete(document):
+                        ConversionCompleteScreen(document: document) {
                             homePath.removeAll()
+                        }
+                    case let .conversionDocumentPreview(document):
+                        switch document.previewDestination {
+                        case .cadViewer:
+                            CADViewerScreen(title: document.fileName, filePath: document.fileURL.path)
+                        case .systemPreview:
+                            ConversionFilePreviewScreen(document: document)
                         }
                     }
                 }
@@ -98,6 +125,7 @@ struct ContentView: View {
         .fullScreenCover(isPresented: $showsWatermarkCamera) {
             WatermarkCameraScreen()
         }
+        .onOpenURL(perform: handleIncomingFile)
         .alert(item: $pendingAction) { action in
             Alert(
                 title: Text(action.title),
@@ -105,6 +133,26 @@ struct ContentView: View {
                 dismissButton: .default(Text("知道了"))
             )
         }
+        .alert(item: $externalImportAlert) { alert in
+            Alert(
+                title: Text(alert.title),
+                message: Text(alert.message),
+                dismissButton: .default(Text("知道了"))
+            )
+        }
+    }
+
+    private func handleIncomingFile(_ url: URL) {
+        guard let kind = ConversionKind.preferredImportKind(for: url) else {
+            externalImportAlert = ConversionAlert(
+                title: "暂不支持",
+                message: "当前文件格式还不能导入，请选择 PDF、DWG 或 DXF 文件。"
+            )
+            return
+        }
+
+        selectedTab = .home
+        homePath.append(.importedConversion(kind, url))
     }
 }
 

@@ -18,22 +18,37 @@ struct CADViewerScreen: View {
             CADViewerBridgeView(viewModel: viewModel, filePath: filePath)
                 .ignoresSafeArea()
 
+            if !viewModel.hotspotAnnotations.isEmpty {
+                hotspotAnnotationsOverlay
+                    .zIndex(0.5)
+            }
+
+            if viewModel.isMarkupSubpanelPresented {
+                markupSubpanelDismissOverlay
+                    .zIndex(1)
+            }
+
+            if viewModel.isHotspotInputPresented {
+                hotspotInputOverlay
+                    .transition(.opacity)
+                    .zIndex(1.5)
+            }
+
+            if viewModel.isLayerSheetPresented {
+                layerPanelOverlay
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .zIndex(2)
+            }
+
             VStack(spacing: 0) {
                 headerBar
                 Spacer()
                 bottomChrome
             }
-
-            if viewModel.isMarkupPanelPresented {
-                markupPanel
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
-            }
+            .zIndex(3)
         }
         .toolbar(.hidden, for: .navigationBar)
         .toolbar(.hidden, for: .tabBar)
-        .sheet(isPresented: $viewModel.isLayerSheetPresented) {
-            layerSheet
-        }
         .sheet(isPresented: $viewModel.isTextSheetPresented) {
             textSheet
         }
@@ -44,7 +59,11 @@ struct CADViewerScreen: View {
                 dismissButton: .default(Text("知道了"))
             )
         }
-        .animation(.easeInOut(duration: 0.2), value: viewModel.isMarkupPanelPresented)
+        .animation(.easeInOut(duration: 0.2), value: viewModel.isMarkupToolbarPresented)
+        .animation(.easeInOut(duration: 0.2), value: viewModel.isMarkupTextInputPresented)
+        .animation(.easeInOut(duration: 0.2), value: viewModel.activeMarkupStylePanel)
+        .animation(.easeInOut(duration: 0.2), value: viewModel.isHotspotInputPresented)
+        .animation(.easeInOut(duration: 0.2), value: viewModel.isLayerSheetPresented)
     }
 
     private var headerBar: some View {
@@ -55,13 +74,13 @@ struct CADViewerScreen: View {
                     ZStack {
                         HStack {
                             Button(action: { dismiss() }) {
-                                Image("返回 (11) 3")
+                                Image("Group 189")
                                     .resizable()
+                                    .renderingMode(.template)
                                     .scaledToFit()
-                                    .frame(width: 22, height: 22)
-                                    .padding(10)
-                                    .background(Color.white.opacity(0.08))
-                                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                                    .foregroundStyle(.white)
+                                    .frame(width: 20, height: 20)
+                                    .frame(width: 28, height: 28, alignment: .leading)
                             }
                             .buttonStyle(.plain)
 
@@ -69,11 +88,11 @@ struct CADViewerScreen: View {
                         }
 
                         Text(viewModel.title)
-                            .font(.system(size: 20, weight: .semibold))
-                            .foregroundColor(.white)
+                            .font(.system(size: 18, weight: .bold))
+                            .foregroundStyle(.white)
                             .lineLimit(1)
                     }
-                    .padding(.horizontal, 20)
+                    .padding(.horizontal, 16)
                     .padding(.top, 8)
                     .padding(.bottom, 12)
                     .background(Color.black.opacity(0.92))
@@ -81,136 +100,320 @@ struct CADViewerScreen: View {
         }
     }
 
+    @ViewBuilder
     private var bottomChrome: some View {
-        VStack(spacing: 18) {
-            HStack(spacing: 22) {
-                statusIcon(title: "图层", symbol: "square.3.layers.3d.top.filled", isActive: viewModel.isLayerSheetPresented)
-                statusIcon(title: "批注", symbol: "pencil.tip.crop.circle", isActive: viewModel.activeMarkup != nil)
-                statusIcon(title: "测量", symbol: "ruler", isActive: false)
-                statusIcon(title: "隐藏", symbol: viewModel.isMarkupHidden ? "eye.slash.fill" : "eye.fill", isActive: viewModel.isMarkupHidden)
-                statusIcon(title: "文字", symbol: "text.magnifyingglass", isActive: viewModel.isTextSheetPresented)
+        if viewModel.isMarkupToolbarPresented {
+            markupBottomChrome
+        } else {
+            defaultBottomToolbar
+        }
+    }
+
+    private var defaultBottomToolbar: some View {
+        ScrollView(.horizontal) {
+            HStack(spacing: 0) {
+                ForEach(CADViewerToolbarItemKind.allCases) { item in
+                    toolbarButton(item)
+                }
             }
+        }
+        .scrollIndicators(.hidden)
+        .frame(height: 66)
+        .background(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(Color.cadToolbarBackground)
+        )
+        .padding(.horizontal, 16)
+        .padding(.bottom, 31)
+    }
+
+    @ViewBuilder
+    private var markupBottomChrome: some View {
+        if let stylePanel = viewModel.activeMarkupStylePanel {
+            markupStylePanel(stylePanel)
+        } else if viewModel.isMarkupTextInputPresented {
+            markupTextInputPanel
+        } else {
+            markupToolbar
+        }
+    }
+
+    private var markupToolbar: some View {
+        HStack(spacing: 0) {
+            ForEach(CADMarkupToolbarItemKind.allCases) { item in
+                markupToolbarButton(item)
+            }
+        }
+        .frame(height: 66)
+        .frame(maxWidth: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(Color.cadToolbarBackground)
+        )
+        .padding(.horizontal, 16)
+        .padding(.bottom, 31)
+    }
+
+    private var markupTextInputPanel: some View {
+        VStack(spacing: 0) {
+            ZStack(alignment: .topLeading) {
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .fill(Color.cadFieldBackground)
+
+                if viewModel.markupTextDraft.isEmpty {
+                    Text("输入文字")
+                        .font(.system(size: 14, weight: .regular))
+                        .foregroundStyle(Color(red: 183 / 255, green: 183 / 255, blue: 183 / 255))
+                        .padding(.leading, 12)
+                        .padding(.top, 12)
+                }
+
+                TextEditor(text: $viewModel.markupTextDraft)
+                    .font(.system(size: 14, weight: .regular))
+                    .foregroundStyle(.white)
+                    .scrollContentBackground(.hidden)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 5)
+            }
+            .frame(height: 76)
+            .padding(.top, 16)
+            .padding(.horizontal, 16)
 
             HStack(spacing: 0) {
-                toolbarButton(title: "图层") {
-                    viewModel.showLayers()
+                Button {
+                    viewModel.showMarkupTextStylePanel()
+                } label: {
+                    HStack(spacing: 8) {
+                        Image("文字 (3) 1")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 20, height: 14)
+
+                        Text("文字样式")
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundStyle(.white)
+                    }
                 }
-                toolbarButton(title: "批注") {
-                    viewModel.showMarkupPanel()
+                .buttonStyle(.plain)
+
+                Spacer()
+
+                Button {
+                    viewModel.confirmMarkupText()
+                } label: {
+                    Image(systemName: "checkmark")
+                        .font(.system(size: 22, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .frame(width: 28, height: 28)
                 }
-                toolbarButton(title: "测量") {
-                    viewModel.showMeasurementPlaceholder()
+                .buttonStyle(.plain)
+            }
+            .padding(.top, 15)
+            .padding(.horizontal, 24)
+        }
+        .frame(height: 148)
+        .frame(maxWidth: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(Color.cadToolbarBackground)
+        )
+        .padding(.horizontal, 16)
+        .padding(.bottom, 31)
+    }
+
+    private func markupStylePanel(_ stylePanel: CADViewerViewModel.MarkupStylePanel) -> some View {
+        VStack(spacing: 0) {
+            HStack(spacing: 0) {
+                Button {
+                    viewModel.dismissMarkupStylePanel()
+                } label: {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .frame(width: 44, height: 44)
                 }
-                toolbarButton(title: viewModel.isMarkupHidden ? "显示批注" : "隐藏批注") {
-                    viewModel.toggleMarkupsHidden()
-                }
-                toolbarButton(title: "文字提取") {
-                    viewModel.showExtractedTexts()
+                .buttonStyle(.plain)
+
+                Spacer()
+
+                Text(stylePanel == .text ? "文字样式" : "手绘样式")
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundStyle(.white)
+
+                Spacer()
+
+                Color.clear
+                    .frame(width: 44, height: 44)
+            }
+            .frame(height: 44)
+
+            if stylePanel == .text {
+                textSizeStyleRow
+                    .frame(height: 56)
+            } else {
+                handDrawLineWidthStyleRow
+                    .frame(height: 56)
+            }
+
+            markupColorStyleRow(stylePanel)
+                .frame(height: 65)
+        }
+        .frame(height: 165)
+        .frame(maxWidth: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(Color.cadToolbarBackground)
+        )
+        .padding(.horizontal, 16)
+        .padding(.bottom, 31)
+    }
+
+    private var textSizeStyleRow: some View {
+        HStack(spacing: 0) {
+            VStack(alignment: .leading, spacing: 6) {
+                Text("字号大小")
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundStyle(.white)
+
+                Text("\(Int(viewModel.markupFontSize))号")
+                    .font(.system(size: 10, weight: .regular))
+                    .foregroundStyle(Color(red: 153 / 255, green: 153 / 255, blue: 153 / 255))
+            }
+            .frame(width: 84, alignment: .leading)
+
+            Slider(value: $viewModel.markupFontSize, in: 12...80, step: 1)
+                .tint(Color.cadActiveBlue)
+        }
+        .padding(.horizontal, 20)
+    }
+
+    private var handDrawLineWidthStyleRow: some View {
+        HStack(spacing: 0) {
+            Text("线条粗细")
+                .font(.system(size: 14, weight: .medium))
+                .foregroundStyle(.white)
+                .frame(width: 84, alignment: .leading)
+
+            HStack(spacing: 22) {
+                ForEach(Array([2.0, 4.0, 6.0].enumerated()), id: \.offset) { index, width in
+                    Button {
+                        viewModel.selectHandDrawLineWeight(CADMarkupLineWeightOption(rawValue: index) ?? .thin)
+                    } label: {
+                        ZStack {
+                            if viewModel.selectedLineWidthIndex == index {
+                                RoundedRectangle(cornerRadius: 6, style: .continuous)
+                                    .fill(Color.cadFieldBackground)
+                            }
+
+                            Capsule()
+                                .fill(markupColor(CADMarkupColorOption(rawValue: viewModel.selectedHandDrawColorIndex) ?? .cyan))
+                                .frame(width: 36, height: width)
+                        }
+                        .frame(width: 64, height: 28)
+                    }
+                    .buttonStyle(.plain)
                 }
             }
-            .frame(maxWidth: 360)
-            .frame(height: 66)
-            .background(
-                RoundedRectangle(cornerRadius: 26, style: .continuous)
-                    .fill(Color(red: 31 / 255, green: 33 / 255, blue: 37 / 255).opacity(0.96))
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 26, style: .continuous)
-                    .stroke(Color.white.opacity(0.08), lineWidth: 1)
-            )
         }
-        .padding(.horizontal, 18)
-        .padding(.bottom, 18)
-        .background(
-            LinearGradient(
-                colors: [Color.clear, Color.black.opacity(0.68)],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea(edges: .bottom)
+        .padding(.horizontal, 20)
+    }
+
+    private func markupColorStyleRow(_ stylePanel: CADViewerViewModel.MarkupStylePanel) -> some View {
+        let selectedIndex = stylePanel == .text ? viewModel.selectedTextColorIndex : viewModel.selectedHandDrawColorIndex
+
+        return HStack(spacing: 0) {
+            Text(stylePanel == .text ? "文字颜色" : "线条颜色")
+                .font(.system(size: 14, weight: .medium))
+                .foregroundStyle(.white)
+                .frame(width: 84, alignment: .leading)
+
+            HStack(spacing: 8) {
+                ForEach(CADMarkupColorOption.allCases) { option in
+                    Button {
+                        viewModel.selectMarkupColor(option, for: stylePanel)
+                    } label: {
+                        ZStack {
+                            if selectedIndex == option.rawValue {
+                                Circle()
+                                    .stroke(.white, lineWidth: 2)
+                                    .frame(width: 34, height: 34)
+                            }
+
+                            Circle()
+                                .fill(markupColor(option))
+                                .frame(width: 24, height: 24)
+                        }
+                        .frame(width: 34, height: 34)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
+        .padding(.horizontal, 20)
+    }
+
+    private var markupSubpanelDismissOverlay: some View {
+        Color.clear
+            .contentShape(Rectangle())
+            .ignoresSafeArea()
+            .onTapGesture {
+                viewModel.dismissMarkupSubpanel()
+            }
+    }
+
+    private func markupColor(_ option: CADMarkupColorOption) -> Color {
+        let rgb = option.rgb
+        return Color(
+            red: Double(rgb.red) / 255,
+            green: Double(rgb.green) / 255,
+            blue: Double(rgb.blue) / 255
         )
     }
 
-    private var markupPanel: some View {
-        VStack {
-            Spacer()
-
-            VStack(alignment: .leading, spacing: 16) {
-                Text("选择批注工具")
-                    .font(.system(size: 17, weight: .semibold))
-                    .foregroundColor(Color(red: 26 / 255, green: 31 / 255, blue: 43 / 255))
-
-                HStack(spacing: 12) {
-                    ForEach(CADViewerViewModel.MarkupOption.allCases) { option in
-                        Button {
-                            viewModel.selectMarkup(option)
-                        } label: {
-                            VStack(spacing: 10) {
-                                Image(systemName: option.symbolName)
-                                    .font(.system(size: 20, weight: .medium))
-                                    .foregroundColor(Color(red: 46 / 255, green: 112 / 255, blue: 255 / 255))
-                                    .frame(width: 44, height: 44)
-                                    .background(Color(red: 237 / 255, green: 244 / 255, blue: 255 / 255))
-                                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-
-                                Text(option.rawValue)
-                                    .font(.system(size: 13, weight: .medium))
-                                    .foregroundColor(Color(red: 70 / 255, green: 78 / 255, blue: 92 / 255))
-                            }
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 10)
-                        }
-                        .buttonStyle(.plain)
-                    }
+    private var layerPanelOverlay: some View {
+        VStack(spacing: 0) {
+            Color.clear
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    viewModel.isLayerSheetPresented = false
                 }
-            }
-            .padding(20)
-            .background(
-                RoundedRectangle(cornerRadius: 28, style: .continuous)
-                    .fill(Color.white)
-            )
-            .padding(.horizontal, 18)
-            .padding(.bottom, 136)
+
+            layerPanel
+                .frame(height: 347)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.black.opacity(0.18).ignoresSafeArea())
-        .onTapGesture {
-            viewModel.isMarkupPanelPresented = false
-        }
+        .ignoresSafeArea()
     }
 
-    private var layerSheet: some View {
-        NavigationStack {
-            List {
-                ForEach(viewModel.layers, id: \.index) { layer in
-                    Button {
-                        viewModel.toggleLayer(layer)
-                    } label: {
-                        HStack(spacing: 14) {
-                            Circle()
-                                .fill(Color(uiColor: layer.color))
-                                .frame(width: 14, height: 14)
+    private var layerPanel: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text("选择图层")
+                .font(.system(size: 16, weight: .medium))
+                .foregroundStyle(.white)
+                .padding(.top, 18)
+                .padding(.leading, 16)
 
-                            Text(layer.name)
-                                .font(.system(size: 15, weight: .medium))
-                                .foregroundColor(Color(red: 32 / 255, green: 39 / 255, blue: 51 / 255))
-
-                            Spacer()
-
-                            Image(systemName: layer.isHidden ? "eye.slash" : "eye")
-                                .foregroundColor(layer.isHidden ? .secondary : Color(red: 46 / 255, green: 112 / 255, blue: 255 / 255))
+            if viewModel.layers.isEmpty {
+                Text("暂无图层数据")
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundStyle(.white.opacity(0.72))
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+            } else {
+                ScrollView {
+                    LazyVStack(alignment: .leading, spacing: 0) {
+                        ForEach(Array(viewModel.layers.enumerated()), id: \.element.index) { offset, layer in
+                            layerRow(layer: layer, showsDisclosure: offset == 0)
                         }
                     }
-                    .buttonStyle(.plain)
-                    .listRowSeparator(.hidden)
+                    .padding(.top, 10)
+                    .padding(.bottom, 16)
                 }
+                .scrollIndicators(.hidden)
             }
-            .listStyle(.plain)
-            .navigationTitle("图层")
-            .navigationBarTitleDisplayMode(.inline)
         }
-        .presentationDetents([.fraction(0.42), .large])
-        .presentationDragIndicator(.visible)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.black.opacity(0.89))
+        .clipShape(TopRoundedRectangle(radius: 24))
     }
 
     private var textSheet: some View {
@@ -257,30 +460,284 @@ struct CADViewerScreen: View {
         .presentationDragIndicator(.visible)
     }
 
-    private func statusIcon(title: String, symbol: String, isActive: Bool) -> some View {
-        VStack(spacing: 8) {
-            Image(systemName: symbol)
-                .font(.system(size: 17, weight: .semibold))
-                .foregroundColor(isActive ? .white : Color.white.opacity(0.7))
-                .frame(width: 34, height: 34)
-                .background(
-                    Circle()
-                        .fill(isActive ? Color(red: 46 / 255, green: 112 / 255, blue: 255 / 255) : Color.white.opacity(0.08))
-                )
+    private func layerRow(layer: CADLayerItem, showsDisclosure: Bool) -> some View {
+        Button {
+            viewModel.toggleLayer(layer)
+        } label: {
+            HStack(spacing: 0) {
+                if showsDisclosure {
+                    Image(systemName: "chevron.down")
+                        .font(.system(size: 10, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .frame(width: 17, height: 10)
+                        .padding(.leading, 20)
+                        .padding(.trailing, 6)
+                } else {
+                    Color.clear
+                        .frame(width: 64)
+                }
 
-            Text(title)
-                .font(.system(size: 11, weight: .medium))
-                .foregroundColor(Color.white.opacity(isActive ? 0.92 : 0.58))
+                layerCheckbox(isSelected: !layer.isHidden)
+
+                Text(layer.name.isEmpty ? "未命名图层" : layer.name)
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                    .padding(.leading, showsDisclosure ? 11 : 6)
+
+                Spacer(minLength: 16)
+            }
+            .frame(height: 34)
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func layerCheckbox(isSelected: Bool) -> some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 4, style: .continuous)
+                .stroke(.white, lineWidth: 1)
+                .frame(width: 18, height: 18)
+
+            if isSelected {
+                Image(systemName: "checkmark")
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundStyle(.white)
+            }
         }
     }
 
-    private func toolbarButton(title: String, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            Text(title)
-                .font(.system(size: 13, weight: .semibold))
-                .foregroundColor(.white)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+    private func markupToolbarButton(_ item: CADMarkupToolbarItemKind) -> some View {
+        let isActive = item != .back && viewModel.selectedMarkupToolbarItem == item
+
+        return Button {
+            viewModel.selectMarkupToolbarItem(item)
+        } label: {
+            VStack(spacing: item == .back ? 0 : 4) {
+                Image(item.iconName(isActive: isActive))
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: item == .back ? 24 : 22, height: item == .back ? 24 : 22)
+
+                if !item.title.isEmpty {
+                    Text(item.title)
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundStyle(isActive ? Color.cadActiveBlue : .white)
+                        .lineLimit(1)
+                }
+            }
+            .frame(maxWidth: item == .back ? 64 : .infinity, maxHeight: .infinity)
         }
         .buttonStyle(.plain)
+    }
+
+    private var hotspotInputOverlay: some View {
+        GeometryReader { proxy in
+            let xScale = proxy.size.width / 393
+            let yScale = proxy.size.height / 852
+
+            ZStack(alignment: .topLeading) {
+                Image("定位 (1) 1")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 24, height: 24)
+                    .offset(x: 140 * xScale, y: 350 * yScale)
+
+                VStack(alignment: .leading, spacing: 12) {
+                    ZStack(alignment: .topLeading) {
+                        RoundedRectangle(cornerRadius: 4, style: .continuous)
+                            .fill(Color.white.opacity(0.8))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 4, style: .continuous)
+                                    .stroke(
+                                        Color.cadActiveBlue,
+                                        style: StrokeStyle(lineWidth: 1, dash: [4, 3])
+                                    )
+                            )
+
+                        if viewModel.hotspotTextDraft.isEmpty {
+                            Text("请输入文本")
+                                .font(.system(size: 12, weight: .regular))
+                                .foregroundStyle(Color(red: 153 / 255, green: 153 / 255, blue: 153 / 255))
+                                .padding(.leading, 10)
+                                .padding(.top, 8)
+                        }
+
+                        TextEditor(text: $viewModel.hotspotTextDraft)
+                            .font(.system(size: 12, weight: .regular))
+                            .foregroundStyle(.black)
+                            .scrollContentBackground(.hidden)
+                            .padding(.horizontal, 5)
+                            .padding(.vertical, 2)
+                    }
+                    .frame(width: 128, height: 84)
+
+                    HStack(spacing: 8) {
+                        Button {
+                            viewModel.cancelHotspotText()
+                        } label: {
+                            Text("取消")
+                                .font(.system(size: 10, weight: .regular))
+                                .foregroundStyle(.black)
+                                .frame(width: 50, height: 26)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 4, style: .continuous)
+                                        .fill(Color(red: 217 / 255, green: 217 / 255, blue: 217 / 255))
+                                )
+                        }
+                        .buttonStyle(.plain)
+
+                        Button {
+                            viewModel.confirmHotspotText()
+                        } label: {
+                            Text("确定")
+                                .font(.system(size: 10, weight: .regular))
+                                .foregroundStyle(.white)
+                                .frame(width: 50, height: 26)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 4, style: .continuous)
+                                        .fill(Color.cadActiveBlue)
+                                )
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    .padding(.leading, 10)
+                }
+                .offset(x: 88 * xScale, y: 388 * yScale)
+            }
+        }
+    }
+
+    private var hotspotAnnotationsOverlay: some View {
+        GeometryReader { proxy in
+            let xScale = proxy.size.width / 393
+            let yScale = proxy.size.height / 852
+
+            ZStack(alignment: .topLeading) {
+                ForEach(Array(viewModel.hotspotAnnotations.enumerated()), id: \.element.id) { index, annotation in
+                    hotspotAnnotationView(annotation)
+                        .offset(x: (88 + CGFloat(index) * 8) * xScale, y: (350 + CGFloat(index) * 28) * yScale)
+                }
+            }
+        }
+        .allowsHitTesting(false)
+    }
+
+    private func hotspotAnnotationView(_ annotation: CADHotspotAnnotation) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Image("定位 (1) 2")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 24, height: 24)
+                .padding(.leading, 52)
+
+            Text(annotation.text)
+                .font(.system(size: 12, weight: .regular))
+                .foregroundStyle(.black)
+                .lineLimit(3)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 8)
+                .frame(width: 128, alignment: .topLeading)
+                .frame(minHeight: 42, alignment: .topLeading)
+                .background(
+                    RoundedRectangle(cornerRadius: 4, style: .continuous)
+                        .fill(Color.white.opacity(0.8))
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 4, style: .continuous)
+                        .stroke(
+                            Color.cadActiveBlue,
+                            style: StrokeStyle(lineWidth: 1, dash: [4, 3])
+                        )
+                )
+        }
+    }
+
+    private func toolbarButton(_ item: CADViewerToolbarItemKind) -> some View {
+        let isActive = isToolbarItemActive(item)
+
+        return Button {
+            handleToolbarItem(item)
+        } label: {
+            VStack(spacing: 4) {
+                Image(item.iconName(isActive: isActive))
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 22, height: 22)
+
+                Text(item.title)
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+            }
+            .frame(width: 72, height: 66)
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func isToolbarItemActive(_ item: CADViewerToolbarItemKind) -> Bool {
+        switch item {
+        case .layers:
+            return viewModel.isLayerSheetPresented
+        case .markup:
+            return viewModel.isMarkupToolbarPresented || viewModel.activeMarkup != nil
+        case .measurement:
+            return false
+        case .hideMarkup:
+            return viewModel.isMarkupHidden
+        case .textExtraction:
+            return viewModel.isTextSheetPresented
+        case .reset, .settings:
+            return false
+        }
+    }
+
+    private func handleToolbarItem(_ item: CADViewerToolbarItemKind) {
+        switch item {
+        case .layers:
+            viewModel.showLayers()
+        case .markup:
+            viewModel.showMarkupPanel()
+        case .measurement:
+            viewModel.showMeasurementPlaceholder()
+        case .hideMarkup:
+            viewModel.toggleMarkupsHidden()
+        case .textExtraction:
+            viewModel.showExtractedTexts()
+        case .reset:
+            viewModel.resetView()
+        case .settings:
+            viewModel.showSettingsPlaceholder()
+        }
+    }
+}
+
+private extension Color {
+    static let cadToolbarBackground = Color(red: 70 / 255, green: 70 / 255, blue: 78 / 255)
+    static let cadFieldBackground = Color(red: 86 / 255, green: 86 / 255, blue: 96 / 255)
+    static let cadActiveBlue = Color(red: 35 / 255, green: 99 / 255, blue: 254 / 255)
+}
+
+private struct TopRoundedRectangle: Shape {
+    let radius: CGFloat
+
+    func path(in rect: CGRect) -> Path {
+        let radius = min(radius, min(rect.width, rect.height) / 2)
+        var path = Path()
+
+        path.move(to: CGPoint(x: rect.minX, y: rect.maxY))
+        path.addLine(to: CGPoint(x: rect.minX, y: rect.minY + radius))
+        path.addQuadCurve(
+            to: CGPoint(x: rect.minX + radius, y: rect.minY),
+            control: CGPoint(x: rect.minX, y: rect.minY)
+        )
+        path.addLine(to: CGPoint(x: rect.maxX - radius, y: rect.minY))
+        path.addQuadCurve(
+            to: CGPoint(x: rect.maxX, y: rect.minY + radius),
+            control: CGPoint(x: rect.maxX, y: rect.minY)
+        )
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
+        path.closeSubpath()
+        return path
     }
 }

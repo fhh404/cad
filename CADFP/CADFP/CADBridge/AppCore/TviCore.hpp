@@ -289,6 +289,8 @@ public:
     OdUInt32 getIndexedColor(int colorIndex);
     ////设置绘图的线条颜色
     void setSettingLinesColor(DrawLinesColor linesColorIndex);
+    void setSettingLinesColorRGB(OdUInt8 red, OdUInt8 green, OdUInt8 blue);
+    void setSettingLinesWeight(OdUInt8 weight);
     
     ////清最后一条标注
     void cleanLastMarks();
@@ -363,6 +365,7 @@ private:
     
     //线条颜色
     OdTvColorDef linesColor = OdTvColorDef(255, 255, 255);
+    OdUInt8 linesWeight = 3;
     std::vector<OdString> m_extractedTexts;
     
     

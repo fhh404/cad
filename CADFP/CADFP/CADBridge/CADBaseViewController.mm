@@ -20,6 +20,8 @@
     int _yMin;
     int _yMax;
     BOOL _markupsHidden;
+    NSString *_pendingMarkupText;
+    double _pendingMarkupTextScale;
 }
 
 @property (nonatomic, copy, readwrite) NSString *filePath;
@@ -31,6 +33,32 @@
 
 @end
 
+static OdUInt8 CADClampedColorComponent(NSInteger value)
+{
+    if (value < 0) {
+        return 0;
+    }
+
+    if (value > 255) {
+        return 255;
+    }
+
+    return (OdUInt8)value;
+}
+
+static OdUInt8 CADClampedMarkupWeight(NSInteger value)
+{
+    if (value < 1) {
+        return 1;
+    }
+
+    if (value > 20) {
+        return 20;
+    }
+
+    return (OdUInt8)value;
+}
+
 @implementation CADBaseViewController
 
 - (instancetype)initWithFilePath:(NSString *)filePath
@@ -40,6 +68,7 @@
         _filePath = [filePath copy];
         _ready = NO;
         _markupsHidden = NO;
+        _pendingMarkupTextScale = 1.0;
         _globalParams = new TviGlobalParameters();
         _globalParams->setDevice(TviGlobalParameters::OpenGLES2);
         _globalParams->setPartialOpen(false);
@@ -271,10 +300,24 @@
     [self requestLayerSnapshot];
 }
 
+- (void)resetView
+{
+    if (!self.isReady) {
+        return;
+    }
+
+    _tvCore.runNavigationAction(TviCore::ZoomExtents);
+}
+
 - (void)activateMarkupTool:(CADMarkupTool)tool
 {
     if (!self.isReady) {
         return;
+    }
+
+    if (tool != CADMarkupToolText) {
+        _pendingMarkupText = nil;
+        _pendingMarkupTextScale = 1.0;
     }
 
     if (_markupsHidden) {
@@ -294,7 +337,43 @@
         case CADMarkupToolText:
             _tvCore.runMarkupAction(TviCore::Text);
             break;
+        case CADMarkupToolHandle:
+            _tvCore.runMarkupAction(TviCore::Handle);
+            break;
     }
+}
+
+- (void)activateTextMarkupWithText:(NSString *)text
+{
+    [self activateTextMarkupWithText:text textSize:1.0];
+}
+
+- (void)activateTextMarkupWithText:(NSString *)text textSize:(double)textSize
+{
+    _pendingMarkupText = [text copy];
+    _pendingMarkupTextScale = textSize > 0 ? textSize : 1.0;
+    [self activateMarkupTool:CADMarkupToolText];
+}
+
+- (void)setMarkupColorWithRed:(NSInteger)red green:(NSInteger)green blue:(NSInteger)blue
+{
+    _tvCore.setSettingLinesColorRGB(CADClampedColorComponent(red), CADClampedColorComponent(green), CADClampedColorComponent(blue));
+}
+
+- (void)setMarkupLineWeight:(NSInteger)weight
+{
+    _tvCore.setSettingLinesWeight(CADClampedMarkupWeight(weight));
+}
+
+- (void)finishActiveMarkup
+{
+    if (!self.isReady) {
+        return;
+    }
+
+    _pendingMarkupText = nil;
+    _pendingMarkupTextScale = 1.0;
+    _tvCore.finishDragger();
 }
 
 - (void)setMarkupsHidden:(BOOL)hidden
@@ -408,6 +487,54 @@
     return wcsPoint;
 }
 
+- (void)prepareTextMarkupViewForTouchPoint:(CGPoint)touchPoint
+{
+    OdTvGsViewPtr viewPtr = _tvCore.getActiveTvViewPtr();
+    if (viewPtr.isNull()) {
+        return;
+    }
+
+    OdTvPoint screenPrevPoint = viewPtr->position().transformBy(viewPtr->worldToDeviceMatrix());
+    OdTvPoint prevPoint = [self toEyeToWorld:(int)screenPrevPoint.x yPos:(int)screenPrevPoint.y viewPtr:viewPtr] - viewPtr->position().asVector();
+    OdTvPoint currentPoint = [self toEyeToWorld:(int)touchPoint.x yPos:(int)touchPoint.y viewPtr:viewPtr];
+    OdTvVector delta = (prevPoint - (currentPoint - viewPtr->position())).asVector();
+    _backDelta = (prevPoint + (viewPtr->position() - currentPoint)).asVector();
+    viewPtr->dolly(-delta.transformBy(viewPtr->viewingMatrix()));
+}
+
+- (void)finishActiveTextMarkupWithText:(NSString *)text
+{
+    OdTvDragger *activeDragger = _tvCore.getActiveDragger();
+    if (!activeDragger) {
+        return;
+    }
+
+    eDraggerResult textResult = activeDragger->processText(NSString2OdString(text ?: @""));
+    _tvCore.actionsAfterDragger(textResult);
+
+    OdTvTextMarkupDragger *textDragger = dynamic_cast<OdTvTextMarkupDragger *>(activeDragger);
+    if (textDragger) {
+        OdTvGeometryDataId textRowId = textDragger->getActiveRow();
+        if (!textRowId.isNull()) {
+            OdTvTextDataPtr textData = textRowId.openAsText();
+            if (!textData.isNull()) {
+                textData->setString(NSString2OdString(text ?: @""));
+                textData->setTextSize(_pendingMarkupTextScale);
+            }
+        }
+    }
+
+    OdTvGsViewPtr viewPtr = _tvCore.getActiveTvViewPtr();
+    if (!viewPtr.isNull()) {
+        viewPtr->dolly(_backDelta.transformBy(viewPtr->viewingMatrix()));
+        _backDelta.set(0.0, 0.0, 0.0);
+    }
+
+    _tvCore.finishDragger();
+    _pendingMarkupTextScale = 1.0;
+    _tvCore.update();
+}
+
 - (void)onTouchEvent:(UITapGestureRecognizer *)sender
 {
     OdTvDragger *dragger = _tvCore.getActiveDragger();
@@ -425,6 +552,16 @@
     _tvCore.actionsAfterDragger(result);
     result = dragger->nextpoint(touchPoint.x, touchPoint.y);
     _tvCore.actionsAfterDragger(result);
+    result = dragger->processText(NSString2OdString(@""));
+    _tvCore.actionsAfterDragger(result);
+    [self prepareTextMarkupViewForTouchPoint:touchPoint];
+
+    if (_pendingMarkupText.length > 0) {
+        NSString *text = [_pendingMarkupText copy];
+        _pendingMarkupText = nil;
+        [self finishActiveTextMarkupWithText:text];
+        return;
+    }
 
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"请输入批注文字"
                                                                    message:nil
@@ -446,32 +583,8 @@
         }
 
         NSString *text = alert.textFields.firstObject.text ?: @"";
-        OdTvDragger *activeDragger = self->_tvCore.getActiveDragger();
-        if (!activeDragger) {
-            return;
-        }
-
-        eDraggerResult textResult = activeDragger->processText(NSString2OdString(text));
-        self->_tvCore.actionsAfterDragger(textResult);
-
-        OdTvGsViewPtr viewPtr = self->_tvCore.getActiveTvViewPtr();
-        if (!viewPtr.isNull()) {
-            viewPtr->dolly(self->_backDelta.transformBy(viewPtr->viewingMatrix()));
-            self->_backDelta.set(0.0, 0.0, 0.0);
-        }
-
-        self->_tvCore.finishDragger();
+        [self finishActiveTextMarkupWithText:text];
     }]];
-
-    OdTvGsViewPtr viewPtr = _tvCore.getActiveTvViewPtr();
-    if (!viewPtr.isNull()) {
-        OdTvPoint screenPrevPoint = viewPtr->position().transformBy(viewPtr->worldToDeviceMatrix());
-        OdTvPoint prevPoint = [self toEyeToWorld:(int)screenPrevPoint.x yPos:(int)screenPrevPoint.y viewPtr:viewPtr] - viewPtr->position().asVector();
-        OdTvPoint currentPoint = [self toEyeToWorld:(int)touchPoint.x yPos:(int)touchPoint.y viewPtr:viewPtr];
-        OdTvVector delta = (prevPoint - (currentPoint - viewPtr->position())).asVector();
-        _backDelta = (prevPoint + (viewPtr->position() - currentPoint)).asVector();
-        viewPtr->dolly(-delta.transformBy(viewPtr->viewingMatrix()));
-    }
 
     [self presentViewController:alert animated:YES completion:nil];
 }

@@ -81,6 +81,10 @@ ODRX_DECLARE_STATIC_MODULE_ENTRY_POINT(OdStlImportModuleImpl);
 //Raster images
 ODRX_DECLARE_STATIC_MODULE_ENTRY_POINT(OdRasterProcessingServicesImpl);
 ODRX_DECLARE_STATIC_MODULE_ENTRY_POINT(ExRasterModule);
+ODRX_DECLARE_STATIC_MODULE_ENTRY_POINT(RasterExportModule);
+ODRX_DECLARE_STATIC_MODULE_ENTRY_POINT(BitmapModule);
+ODRX_DECLARE_STATIC_MODULE_ENTRY_POINT(OdPdfExportModule);
+ODRX_DECLARE_STATIC_MODULE_ENTRY_POINT(PdfImportModule);
 //Device
 ODRX_DECLARE_STATIC_MODULE_ENTRY_POINT(OdTrGL2RenderModule);
 ODRX_DECLARE_STATIC_MODULE_ENTRY_POINT(GLES2Module);
@@ -150,6 +154,14 @@ ODRX_DEFINE_STATIC_APPMODULE(RX_RCS_FILE_SERVICES,                   RcsFileServ
 ODRX_DEFINE_STATIC_APPMODULE(OdRasterProcessorModuleName,            OdRasterProcessingServicesImpl)
 ODRX_DEFINE_STATIC_APPMODULE(RX_RASTER_SERVICES_APPNAME,             ExRasterModule)
 #endif
+#ifndef POINTCLOUD_ENABLED
+ODRX_DEFINE_STATIC_APPMODULE(OdRasterProcessorModuleName,            OdRasterProcessingServicesImpl)
+ODRX_DEFINE_STATIC_APPMODULE(RX_RASTER_SERVICES_APPNAME,             ExRasterModule)
+#endif
+ODRX_DEFINE_STATIC_APPMODULE(OdRasterExportModuleName,               RasterExportModule)
+ODRX_DEFINE_STATIC_APPMODULE(OdWinBitmapModuleName,                  BitmapModule)
+ODRX_DEFINE_STATIC_APPMODULE(OdPdfExportModuleName,                  OdPdfExportModule)
+ODRX_DEFINE_STATIC_APPMODULE(OdPdfImportModuleName,                  PdfImportModule)
 
 ODRX_DEFINE_STATIC_APPMODULE(OdTrGL2ModuleName,                      OdTrGL2RenderModule)
 ODRX_DEFINE_STATIC_APPMODULE(OdWinGLES2ModuleName,                   GLES2Module)
