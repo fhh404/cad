@@ -80,7 +80,33 @@ OdTvLayersIteratorPtr TviCore::getLayers()
 
     
 }
+static bool CADTextPositionMatchesRange(
+    const OdGePoint3d& position,
+    bool shouldFilter,
+    double minX,
+    double minY,
+    double maxX,
+    double maxY
+)
+{
+    if (!shouldFilter) {
+        return true;
+    }
+
+    return position.x >= minX && position.x <= maxX && position.y >= minY && position.y <= maxY;
+}
+
 void TviCore::searchDBDataContent()
+{
+    searchDBDataContent(false, 0.0, 0.0, 0.0, 0.0);
+}
+
+void TviCore::searchDBDataContent(double minX, double minY, double maxX, double maxY)
+{
+    searchDBDataContent(true, minX, minY, maxX, maxY);
+}
+
+void TviCore::searchDBDataContent(bool shouldFilter, double minX, double minY, double maxX, double maxY)
 {
     m_extractedTexts.clear();
     OdTvResult rc;
@@ -99,8 +125,8 @@ void TviCore::searchDBDataContent()
         for (; !entityPtr->done(); entityPtr->step()) {
         
             OdTvEntityId entityId = entityPtr->getEntity(&rc);
-             
-            OdTvEntityPtr entityPtr = entityId.openObject(OdTv::kForWrite);
+
+            OdTvEntityPtr entityPtr = entityId.openObject(OdTv::kForRead);
             
             
 //            NSLog(@"==%@",OdString2NSString(entityPtr->get()));
@@ -113,9 +139,9 @@ void TviCore::searchDBDataContent()
                 OdTvTextDataPtr textPtr = textId.openAsText();
                 if (!textPtr.isNull()) {
                     OdString extracted = textPtr->getString();
-                    if (!extracted.isEmpty()) {
+                    OdGePoint3d position = textPtr->getPosition();
+                    if (!extracted.isEmpty() && CADTextPositionMatchesRange(position, shouldFilter, minX, minY, maxX, maxY)) {
                         m_extractedTexts.push_back(extracted);
-                        NSLog(@"==%@",OdString2NSString(extracted));
                     }
                 }
  

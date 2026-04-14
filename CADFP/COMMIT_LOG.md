@@ -1,41 +1,34 @@
 # Git 提交日志
 
-## 最新提交 (2026-04-11)
+## 最新提交 (2026-04-13)
 
 ### 提交信息
-**Commit:** 70919466960845ced3403f1e5c9ae412ae0be6be  
+**Commit:** 2573fb03fde7902451d987b48a838f79849e6990  
 **作者:** fhh404 <406138227@qq.com>  
-**日期:** Fri Apr 11 18:23:13 2026 +0800
+**日期:** 2026-04-13 19:13:17 +0800
 
 ### 提交标题
-feat: 添加水平仪工具和单位转换功能
+feat: 增强单位转换功能和 CAD 查看器工具栏
 
 ### 提交详情
-- 实现水平仪工具套件（圆形水平仪、条形水平仪）
-- 实现单位转换功能（长度、面积、体积、质量、温度等）
-- 更新导航架构支持水平仪和转换工具
-- 添加大量 CAD 图标资源
-- 更新测试和文档
+- 增强单位转换功能，支持外部文件导入和文档预览
+- 实现 CAD 转换桥接，支持 DWG/DXF 文件格式转换
+- 更新 CAD 查看器，添加工具栏功能
+- 更新导航架构，支持外部文件导入处理
+- 更新 CADBridge 核心模块
+- 完善测试和图标资源
 
 ### 文件变更统计
-- **83 个文件修改**
-- **2132 行新增**
-- **48 行删除**
+- **68 个文件修改**
+- **3408 行新增**
+- **307 行删除**
 
 ### 主要变更文件
 
-#### 新增水平仪工具（Level）
-- `CircularLevelScreen.swift` - 圆形水平仪界面（134 行）
-- `BarLevelScreen.swift` - 条形水平仪界面（137 行）
-- `LevelGeometry.swift` - 水平仪几何计算（115 行）
-- `LevelMotionEngine.swift` - 运动引擎封装（122 行）
-- 使用设备运动传感器实现精确水平测量
-
-#### 新增单位转换功能（Conversion）
-- `ConversionScreen.swift` - 单位转换界面（469 行）
-- `ConversionModels.swift` - 转换数据模型（138 行）
-- `ConversionDocumentStore.swift` - 转换文档存储（84 行）
-- `ConversionCompleteScreen.swift` - 转换完成界面
+#### 增强单位转换功能（Conversion）
+- `ConversionScreen.swift` - 支持外部文件导入和文档预览（+446 行）
+- `ConversionModels.swift` - 添加 ConversionDocument 数据模型（+64 行）
+- `ConversionDocumentStore.swift` - 完整的转换文档存储管理（+73 行）
 - 支持的转换类型：
   - 长度转换（米、千米、厘米、毫米、英里、码、英尺、英寸等）
   - 面积转换（平方米、平方千米、平方英里、平方码、平方英尺、平方英寸、公顷、亩等）
@@ -43,44 +36,80 @@ feat: 添加水平仪工具和单位转换功能
   - 质量转换（千克、克、毫克、吨、磅、盎司、石等）
   - 温度转换（摄氏度、华氏度、开尔文）
 
+#### 实现 CAD 转换桥接
+- `CADConversionBridge.h` - Objective-C 桥接头文件（25 行）
+- `CADConversionBridge.mm` - CAD 转换桥接实现（442 行）
+- `CADConversionEngine.swift` - Swift 转换引擎（177 行）
+- 支持 DWG/DXF 文件格式转换
+
+#### 更新 CAD 查看器（CADViewer）
+- `CADViewerScreen.swift` - 支持文件路径加载和工具栏（+717 行）
+- `CADViewerViewModel.swift` - 增强视图模型功能（+386 行）
+- 添加工具栏功能，支持更多交互操作
+
 #### 更新导航架构
-- `ContentView.swift` - 添加新路由（+22 行）
-  - `measurementCircularLevel` - 圆形水平仪路由
-  - `measurementBarLevel` - 条形水平仪路由
-  - `conversion` - 单位转换路由
-  - `conversionComplete` - 转换完成路由
-- 集成水平仪和转换工具到主导航流程
+- `ContentView.swift` - 添加新路由（+60 行）
+  - `importedConversion` - 外部文件导入路由
+  - `conversionDocumentPreview` - 文档预览路由
+- 支持外部文件导入处理
+- 实现文档预览展示（CAD 文件或系统预览）
 
-#### 更新测量工具目录
-- `MeasurementCatalogScreen.swift` - 支持水平仪导航（+25 行，-25 行）
-- `MeasurementModels.swift` - 更新工具实现状态（+1 行，-1 行）
-- `RulerScreen.swift` - 代码清理（-1 行）
+#### 更新 CADBridge 核心
+- `TviActivator.cpp` - 激活器更新（+48 行）
+- `TviCore.hpp` - 核心引擎头文件增强（+7 行）
+- `TviCore.mm` - 核心引擎实现增强（+54 行）
+- `CADBaseViewController.h` - 基础视图控制器头文件（+7 行）
+- `CADBaseViewController.mm` - 基础视图控制器实现增强（+163 行）
 
-#### 新增图标资源
-- 大量 CAD 相关图标（Vector 系列 0-21）
-- 材质文档图标
-- 布尔运算图标（And、Subtract、Union）
-- 其他功能图标
+#### 新增配置文件
+- `Info.plist` - 应用信息配置（109 行）
 
-#### 更新测试
-- `ConversionDocumentStoreTests.swift` - 新增转换存储测试（29 行）
-- `LevelGeometryTests.swift` - 更新水平仪几何测试（+14 行）
+#### 完善测试
+- `CADViewerToolbarItemTests.swift` - CAD 查看器工具栏测试（33 行）
+- `ConversionDocumentStoreTests.swift` - 增强转换存储测试（+290 行）
 
-#### 更新文档
-- `docs/superpowers/plans/2026-04-10-level-tools.md` - 更新水平仪计划
-- `docs/superpowers/specs/2026-04-10-level-tools-design.md` - 更新水平仪设计规格
+#### 更新 HomeView
+- `HomeView.swift` - 更新主视图逻辑（+11 行）
+
+#### 添加图标资源
+- 重命名图标
+- 默认文字图标
+- 其他 CAD 功能图标
 
 ### 提交说明
-本次提交实现了两个重要功能模块：
+本次提交主要增强了单位转换功能和 CAD 查看器：
 
-1. **水平仪工具**：利用设备运动传感器实现圆形和条形两种水平仪，提供精确的水平测量能力
-2. **单位转换**：提供全面的单位转换功能，支持长度、面积、体积、质量、温度等多种转换类型，满足 CAD 设计中的单位换算需求
+1. **单位转换增强**：
+   - 支持外部文件导入进行转换
+   - 添加文档预览功能，可直接预览转换后的 CAD 文件
+   - 实现完整的 ConversionDocument 数据模型
+   - 支持 CAD 文件直接预览或系统预览
 
-同时添加了大量图标资源，完善了应用的视觉体系，并更新了导航架构以支持新的功能模块。
+2. **CAD 转换桥接**：
+   - 实现 Objective-C 桥接层（CADConversionBridge）
+   - 实现 Swift 转换引擎（CADConversionEngine）
+   - 支持 DWG/DXF 文件格式的转换
+
+3. **CAD 查看器增强**：
+   - 添加工具栏功能，提供更多交互选项
+   - 支持通过文件路径加载 CAD 文件
+   - 增强视图模型，支持更复杂的状态管理
+
+4. **导航架构升级**：
+   - 添加 importedConversion 路由，支持外部文件导入
+   - 添加 conversionDocumentPreview 路由，支持文档预览
+   - 实现外部文件导入的告警处理
+
+5. **CADBridge 核心更新**：
+   - 更新 TviActivator 激活器
+   - 增强 TviCore 核心引擎
+   - 增强 CADBaseViewController 基础视图控制器
+
+这为应用提供了更强大的 CAD 文件处理和转换能力，同时改善了用户体验。
 
 ---
 
-## 上次提交 (2026-04-10)
+## 上次提交 (2026-04-11)
 
 ### 提交信息
 **Commit:** f37e2b79f111c960dca82783749e323b1b8c3569  

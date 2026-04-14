@@ -1,5 +1,7 @@
-import Foundation
 import Combine
+import CoreGraphics
+import Foundation
+import UIKit
 
 @MainActor
 final class CADViewerViewModel: ObservableObject {
@@ -45,6 +47,9 @@ final class CADViewerViewModel: ObservableObject {
     @Published var extractedTexts: [String] = []
     @Published var isLayerSheetPresented = false
     @Published var isMarkupToolbarPresented = false
+    @Published var isMeasurementToolbarPresented = false
+    @Published var selectedMeasurementMode = CADMeasurementMode.length
+    @Published var measurementSamples: [CADMeasurementSample] = []
     @Published var isMarkupTextInputPresented = false
     @Published var selectedMarkupToolbarItem: CADMarkupToolbarItemKind?
     @Published var activeMarkupStylePanel: MarkupStylePanel?
@@ -57,12 +62,28 @@ final class CADViewerViewModel: ObservableObject {
     @Published var selectedHandDrawColorIndex = 1
     @Published var selectedLineWidthIndex = 0
     @Published var isTextSheetPresented = false
+    @Published var isTextExtractionOverlayPresented = false
+    @Published var textExtractionSelectionRect = CADTextExtractionSelectionGeometry.normalized(
+        CADTextExtractionSelectionGeometry.initialDesignRect,
+        in: CADTextExtractionSelectionGeometry.designCanvasSize
+    )
+    @Published var hasTextExtractionAttempted = false
     @Published var isExtractingTexts = false
     @Published var isMarkupHidden = false
+    @Published var isSettingsPanelPresented = false
+    @Published var selectedSettingsBackground = CADViewerSettingsBackgroundOption.defaultOption
+    @Published var settingsRotationDegrees = 0
     @Published var activeMarkup: MarkupOption?
     @Published var alertMessage: AlertMessage?
 
-    weak var controller: CADBaseViewController?
+    weak var controller: CADBaseViewController? {
+        didSet {
+            oldValue?.isMeasurementModeEnabled = false
+            controller?.isMeasurementModeEnabled = isMeasurementToolbarPresented
+            applySettingsBackground()
+            applySettingsRotation()
+        }
+    }
 
     init(title: String) {
         self.title = title
@@ -72,13 +93,47 @@ final class CADViewerViewModel: ObservableObject {
         isMarkupTextInputPresented || activeMarkupStylePanel != nil
     }
 
+    var measurementLengthText: String? {
+        guard selectedMeasurementMode == .length, measurementSamples.count >= 2 else {
+            return nil
+        }
+
+        return CADMeasurementCalculator.formattedLength(
+            CADMeasurementCalculator.length(from: measurementSamples.map(\.worldPoint))
+        )
+    }
+
+    var measurementAreaText: String? {
+        guard selectedMeasurementMode == .area, measurementSamples.count >= 3 else {
+            return nil
+        }
+
+        return CADMeasurementCalculator.formattedArea(
+            CADMeasurementCalculator.area(from: measurementSamples.map(\.worldPoint))
+        )
+    }
+
+    var measurementCoordinateText: String? {
+        guard selectedMeasurementMode == .coordinate, let worldPoint = measurementSamples.last?.worldPoint else {
+            return nil
+        }
+
+        return CADMeasurementCalculator.formattedCoordinate(worldPoint)
+    }
+
     func showLayers() {
         dismissMarkupChrome()
+        dismissMeasurementChrome()
+        dismissTextExtractionChrome()
+        dismissSettingsChrome()
         controller?.requestLayerSnapshot()
         isLayerSheetPresented = true
     }
 
     func showMarkupPanel() {
+        dismissMeasurementChrome()
+        dismissTextExtractionChrome()
+        dismissSettingsChrome()
         isLayerSheetPresented = false
         isMarkupToolbarPresented = true
         isMarkupTextInputPresented = false
@@ -184,8 +239,52 @@ final class CADViewerViewModel: ObservableObject {
         hotspotTextDraft = ""
     }
 
-    func showMeasurementPlaceholder() {
-        alertMessage = AlertMessage(title: "测量", message: "第一版先把图层、批注、隐藏批注和文字提取接通，测量能力会在下一阶段补上。")
+    func showMeasurementPanel() {
+        dismissMarkupChrome()
+        dismissTextExtractionChrome()
+        dismissSettingsChrome()
+        isLayerSheetPresented = false
+        isTextSheetPresented = false
+        isHotspotInputPresented = false
+        isMeasurementToolbarPresented = true
+        selectedMeasurementMode = .length
+        measurementSamples = []
+        controller?.isMeasurementModeEnabled = true
+    }
+
+    func dismissMeasurementPanel() {
+        dismissMeasurementChrome()
+    }
+
+    func selectMeasurementMode(_ mode: CADMeasurementMode) {
+        selectedMeasurementMode = mode
+        measurementSamples = []
+        isMeasurementToolbarPresented = true
+        controller?.isMeasurementModeEnabled = true
+    }
+
+    func handleMeasuredPoint(screenPoint: CGPoint, worldCoordinate: CADMeasurementCoordinate) {
+        let sample = CADMeasurementSample(
+            screenPoint: screenPoint,
+            worldPoint: CADMeasurementWorldPoint(
+                x: worldCoordinate.x,
+                y: worldCoordinate.y,
+                z: worldCoordinate.z
+            )
+        )
+
+        switch selectedMeasurementMode {
+        case .length:
+            if measurementSamples.count >= 2 {
+                measurementSamples = [sample]
+            } else {
+                measurementSamples.append(sample)
+            }
+        case .area:
+            measurementSamples.append(sample)
+        case .coordinate:
+            measurementSamples = [sample]
+        }
     }
 
     func toggleMarkupsHidden() {
@@ -195,19 +294,84 @@ final class CADViewerViewModel: ObservableObject {
 
     func showExtractedTexts() {
         dismissMarkupChrome()
+        dismissMeasurementChrome()
+        dismissSettingsChrome()
         isLayerSheetPresented = false
         extractedTexts = []
+        isExtractingTexts = false
+        hasTextExtractionAttempted = false
+        isTextSheetPresented = false
+        isTextExtractionOverlayPresented = true
+        textExtractionSelectionRect = CADTextExtractionSelectionGeometry.normalized(
+            CADTextExtractionSelectionGeometry.initialDesignRect,
+            in: CADTextExtractionSelectionGeometry.designCanvasSize
+        )
+    }
+
+    func cancelTextExtraction() {
+        dismissTextExtractionChrome()
+    }
+
+    func confirmTextExtraction(in canvasSize: CGSize) {
+        let selectionRect = CADTextExtractionSelectionGeometry.denormalized(
+            textExtractionSelectionRect,
+            in: canvasSize
+        )
+        extractedTexts = []
         isExtractingTexts = true
-        isTextSheetPresented = true
-        controller?.requestExtractedTexts()
+        hasTextExtractionAttempted = true
+        controller?.requestExtractedTexts(inViewRect: selectionRect)
+    }
+
+    func updateTextExtractionSelection(_ rect: CGRect, in canvasSize: CGSize) {
+        let clampedRect = CADTextExtractionSelectionGeometry.clamped(rect, in: canvasSize)
+        textExtractionSelectionRect = CADTextExtractionSelectionGeometry.normalized(clampedRect, in: canvasSize)
+    }
+
+    func copyExtractedTexts() {
+        let content = extractedTexts.joined(separator: "\n")
+        guard !content.isEmpty else {
+            alertMessage = AlertMessage(title: "文字提取", message: "当前没有可复制的文字。")
+            return
+        }
+
+        UIPasteboard.general.string = content
+        alertMessage = AlertMessage(title: "文字提取", message: "已复制提取结果。")
     }
 
     func resetView() {
         controller?.resetView()
     }
 
-    func showSettingsPlaceholder() {
-        alertMessage = AlertMessage(title: "设置", message: "图纸设置功能会在下一阶段接入。")
+    func showSettingsPanel() {
+        dismissMarkupChrome()
+        dismissMeasurementChrome()
+        dismissTextExtractionChrome()
+        isLayerSheetPresented = false
+        isTextSheetPresented = false
+        isHotspotInputPresented = false
+        isSettingsPanelPresented = true
+        applySettingsBackground()
+        applySettingsRotation()
+    }
+
+    func dismissSettingsPanel() {
+        dismissSettingsChrome()
+    }
+
+    func rotateSettingsViewCounterclockwise() {
+        settingsRotationDegrees = CADViewerSettingsRotation.normalizedDegrees(settingsRotationDegrees - 90)
+        applySettingsRotation()
+    }
+
+    func rotateSettingsViewClockwise() {
+        settingsRotationDegrees = CADViewerSettingsRotation.normalizedDegrees(settingsRotationDegrees + 90)
+        applySettingsRotation()
+    }
+
+    func selectSettingsBackground(_ option: CADViewerSettingsBackgroundOption) {
+        selectedSettingsBackground = option
+        applySettingsBackground()
     }
 
     func toggleLayer(_ item: CADLayerItem) {
@@ -233,6 +397,24 @@ final class CADViewerViewModel: ObservableObject {
         activeMarkupStylePanel = nil
         isHotspotInputPresented = false
         finishActiveMarkupTool()
+    }
+
+    private func dismissMeasurementChrome() {
+        isMeasurementToolbarPresented = false
+        measurementSamples = []
+        controller?.isMeasurementModeEnabled = false
+    }
+
+    private func dismissTextExtractionChrome() {
+        isTextExtractionOverlayPresented = false
+        isTextSheetPresented = false
+        isExtractingTexts = false
+        hasTextExtractionAttempted = false
+        extractedTexts = []
+    }
+
+    private func dismissSettingsChrome() {
+        isSettingsPanelPresented = false
     }
 
     private func finishActiveMarkupTool() {
@@ -268,6 +450,15 @@ final class CADViewerViewModel: ObservableObject {
     private func lineWeightOption(for index: Int) -> CADMarkupLineWeightOption {
         CADMarkupLineWeightOption(rawValue: index) ?? .thin
     }
+
+    private func applySettingsBackground() {
+        let color = selectedSettingsBackground.rgb
+        controller?.setDrawingBackground(red: color.red, green: color.green, blue: color.blue)
+    }
+
+    private func applySettingsRotation() {
+        controller?.setViewRotation(degrees: settingsRotationDegrees)
+    }
 }
 
 struct CADHotspotAnnotation: Identifiable, Equatable {
@@ -275,10 +466,304 @@ struct CADHotspotAnnotation: Identifiable, Equatable {
     let text: String
 }
 
+enum CADMeasurementMode: String, CaseIterable, Identifiable {
+    case length
+    case area
+    case coordinate
+
+    var id: String { rawValue }
+}
+
+struct CADMeasurementWorldPoint: Equatable {
+    let x: Double
+    let y: Double
+    let z: Double
+}
+
+struct CADMeasurementSample: Identifiable, Equatable {
+    let id = UUID()
+    let screenPoint: CGPoint
+    let worldPoint: CADMeasurementWorldPoint
+}
+
+enum CADMeasurementCalculator {
+    private static let formatter: NumberFormatter = {
+        let formatter = NumberFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.numberStyle = .decimal
+        formatter.usesGroupingSeparator = false
+        formatter.minimumFractionDigits = 0
+        formatter.maximumFractionDigits = 2
+        formatter.roundingMode = .halfUp
+        return formatter
+    }()
+
+    static func length(from points: [CADMeasurementWorldPoint]) -> Double {
+        guard points.count >= 2, let first = points.first, let second = points.dropFirst().first else {
+            return 0
+        }
+
+        let dx = second.x - first.x
+        let dy = second.y - first.y
+        let dz = second.z - first.z
+        return sqrt(dx * dx + dy * dy + dz * dz)
+    }
+
+    static func area(from points: [CADMeasurementWorldPoint]) -> Double {
+        guard points.count >= 3 else {
+            return 0
+        }
+
+        var sum = 0.0
+        for index in points.indices {
+            let current = points[index]
+            let next = points[index == points.index(before: points.endIndex) ? points.startIndex : points.index(after: index)]
+            sum += current.x * next.y - next.x * current.y
+        }
+        return abs(sum) / 2
+    }
+
+    static func formattedLength(_ value: Double) -> String {
+        formattedScalar(value)
+    }
+
+    static func formattedArea(_ value: Double) -> String {
+        "\(formattedScalar(value))㎡"
+    }
+
+    static func formattedCoordinate(_ point: CADMeasurementWorldPoint) -> String {
+        "X:\(formattedScalar(point.x))\nY:\(formattedScalar(point.y))"
+    }
+
+    private static func formattedScalar(_ value: Double) -> String {
+        formatter.string(from: NSNumber(value: value)) ?? "0"
+    }
+}
+
+enum CADTextExtractionSelectionHandle: CaseIterable, Identifiable {
+    case topLeading
+    case top
+    case topTrailing
+    case leading
+    case trailing
+    case bottomLeading
+    case bottom
+    case bottomTrailing
+
+    var id: String {
+        switch self {
+        case .topLeading:
+            return "topLeading"
+        case .top:
+            return "top"
+        case .topTrailing:
+            return "topTrailing"
+        case .leading:
+            return "leading"
+        case .trailing:
+            return "trailing"
+        case .bottomLeading:
+            return "bottomLeading"
+        case .bottom:
+            return "bottom"
+        case .bottomTrailing:
+            return "bottomTrailing"
+        }
+    }
+}
+
+enum CADTextExtractionSelectionGeometry {
+    static let designCanvasSize = CGSize(width: 393, height: 852)
+    static let initialDesignRect = CGRect(x: 56, y: 322, width: 220, height: 180)
+    static let minimumSize = CGSize(width: 64, height: 64)
+
+    static func normalized(_ rect: CGRect, in bounds: CGSize) -> CGRect {
+        guard bounds.width > 0, bounds.height > 0 else {
+            return .zero
+        }
+
+        let clampedRect = clamped(rect, in: bounds)
+        return CGRect(
+            x: clampedRect.minX / bounds.width,
+            y: clampedRect.minY / bounds.height,
+            width: clampedRect.width / bounds.width,
+            height: clampedRect.height / bounds.height
+        )
+    }
+
+    static func denormalized(_ rect: CGRect, in bounds: CGSize) -> CGRect {
+        guard bounds.width > 0, bounds.height > 0 else {
+            return .zero
+        }
+
+        return clamped(
+            CGRect(
+                x: rect.minX * bounds.width,
+                y: rect.minY * bounds.height,
+                width: rect.width * bounds.width,
+                height: rect.height * bounds.height
+            ),
+            in: bounds
+        )
+    }
+
+    static func moved(_ rect: CGRect, by translation: CGSize, in bounds: CGSize) -> CGRect {
+        clamped(rect.offsetBy(dx: translation.width, dy: translation.height), in: bounds)
+    }
+
+    static func resized(
+        _ rect: CGRect,
+        handle: CADTextExtractionSelectionHandle,
+        by translation: CGSize,
+        in bounds: CGSize
+    ) -> CGRect {
+        guard bounds.width > 0, bounds.height > 0 else {
+            return .zero
+        }
+
+        var minX = rect.minX
+        var maxX = rect.maxX
+        var minY = rect.minY
+        var maxY = rect.maxY
+
+        switch handle {
+        case .topLeading:
+            minX += translation.width
+            minY += translation.height
+        case .top:
+            minY += translation.height
+        case .topTrailing:
+            maxX += translation.width
+            minY += translation.height
+        case .leading:
+            minX += translation.width
+        case .trailing:
+            maxX += translation.width
+        case .bottomLeading:
+            minX += translation.width
+            maxY += translation.height
+        case .bottom:
+            maxY += translation.height
+        case .bottomTrailing:
+            maxX += translation.width
+            maxY += translation.height
+        }
+
+        if maxX - minX < minimumSize.width {
+            if handle.resizesLeadingEdge {
+                minX = maxX - minimumSize.width
+            } else {
+                maxX = minX + minimumSize.width
+            }
+        }
+
+        if maxY - minY < minimumSize.height {
+            if handle.resizesTopEdge {
+                minY = maxY - minimumSize.height
+            } else {
+                maxY = minY + minimumSize.height
+            }
+        }
+
+        if minX < 0 {
+            if handle.resizesLeadingEdge {
+                minX = 0
+            } else {
+                maxX -= minX
+                minX = 0
+            }
+        }
+        if maxX > bounds.width {
+            if handle.resizesTrailingEdge {
+                maxX = bounds.width
+            } else {
+                minX -= maxX - bounds.width
+                maxX = bounds.width
+            }
+        }
+        if minY < 0 {
+            if handle.resizesTopEdge {
+                minY = 0
+            } else {
+                maxY -= minY
+                minY = 0
+            }
+        }
+        if maxY > bounds.height {
+            if handle.resizesBottomEdge {
+                maxY = bounds.height
+            } else {
+                minY -= maxY - bounds.height
+                maxY = bounds.height
+            }
+        }
+
+        return clamped(CGRect(x: minX, y: minY, width: maxX - minX, height: maxY - minY), in: bounds)
+    }
+
+    static func clamped(_ rect: CGRect, in bounds: CGSize) -> CGRect {
+        guard bounds.width > 0, bounds.height > 0 else {
+            return .zero
+        }
+
+        let width = min(max(rect.width, minimumSize.width), bounds.width)
+        let height = min(max(rect.height, minimumSize.height), bounds.height)
+        let originX = min(max(rect.minX, 0), max(bounds.width - width, 0))
+        let originY = min(max(rect.minY, 0), max(bounds.height - height, 0))
+        return CGRect(x: originX, y: originY, width: width, height: height)
+    }
+}
+
+private extension CADTextExtractionSelectionHandle {
+    var resizesLeadingEdge: Bool {
+        self == .topLeading || self == .leading || self == .bottomLeading
+    }
+
+    var resizesTrailingEdge: Bool {
+        self == .topTrailing || self == .trailing || self == .bottomTrailing
+    }
+
+    var resizesTopEdge: Bool {
+        self == .topLeading || self == .top || self == .topTrailing
+    }
+
+    var resizesBottomEdge: Bool {
+        self == .bottomLeading || self == .bottom || self == .bottomTrailing
+    }
+}
+
 struct CADMarkupRGB: Equatable {
     let red: Int
     let green: Int
     let blue: Int
+}
+
+enum CADViewerSettingsBackgroundOption: Int, CaseIterable, Identifiable {
+    case white
+    case gray
+    case black
+
+    static let defaultOption = CADViewerSettingsBackgroundOption.black
+
+    var id: Int { rawValue }
+
+    var rgb: CADMarkupRGB {
+        switch self {
+        case .white:
+            return CADMarkupRGB(red: 255, green: 255, blue: 255)
+        case .gray:
+            return CADMarkupRGB(red: 151, green: 154, blue: 153)
+        case .black:
+            return CADMarkupRGB(red: 0, green: 0, blue: 0)
+        }
+    }
+}
+
+enum CADViewerSettingsRotation {
+    static func normalizedDegrees(_ degrees: Int) -> Int {
+        let normalized = degrees % 360
+        return normalized >= 0 ? normalized : normalized + 360
+    }
 }
 
 enum CADMarkupColorOption: Int, CaseIterable, Identifiable {
@@ -330,7 +815,11 @@ enum CADMarkupLineWeightOption: Int, CaseIterable, Identifiable {
 
 enum CADMarkupFontSizeMapper {
     static func textScale(for fontSize: Double) -> Double {
-        max(0.25, fontSize / 49.0)
+        guard abs(fontSize - 49) > 0.001 else {
+            return 0.0
+        }
+
+        return max(0.25, fontSize / 49.0)
     }
 }
 
@@ -399,6 +888,71 @@ enum CADViewerToolbarItemKind: String, CaseIterable, Identifiable {
             return "重置筛选 2"
         case .settings:
             return "设置 (2) 2"
+        }
+    }
+
+    func iconName(isActive: Bool) -> String {
+        isActive ? activeIconName : inactiveIconName
+    }
+}
+
+enum CADMeasurementToolbarItemKind: String, CaseIterable, Identifiable {
+    case back
+    case length
+    case area
+    case coordinate
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .back:
+            return ""
+        case .length:
+            return "测长度"
+        case .area:
+            return "测面积"
+        case .coordinate:
+            return "测坐标"
+        }
+    }
+
+    var mode: CADMeasurementMode? {
+        switch self {
+        case .back:
+            return nil
+        case .length:
+            return .length
+        case .area:
+            return .area
+        case .coordinate:
+            return .coordinate
+        }
+    }
+
+    var inactiveIconName: String {
+        switch self {
+        case .back:
+            return "返回 (2) 1"
+        case .length:
+            return "长度测量 1-1"
+        case .area:
+            return "面积 1"
+        case .coordinate:
+            return "坐标 1"
+        }
+    }
+
+    var activeIconName: String {
+        switch self {
+        case .back:
+            return "返回 (2) 1"
+        case .length:
+            return "长度测量 1"
+        case .area:
+            return "面积 2"
+        case .coordinate:
+            return "坐标 1-1"
         }
     }
 

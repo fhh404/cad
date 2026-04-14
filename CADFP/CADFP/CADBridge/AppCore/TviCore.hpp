@@ -306,6 +306,7 @@ public:
     
     ////获取内容--搜索功能
     void searchDBDataContent();
+    void searchDBDataContent(double minX, double minY, double maxX, double maxY);
     const std::vector<OdString>& getExtractedTexts() const { return m_extractedTexts; }
     
     //改
@@ -319,6 +320,7 @@ public:
     
 private:
     void release();
+    void searchDBDataContent(bool shouldFilter, double minX, double minY, double maxX, double maxY);
     void setupDevice(NSObject* context, const OdTvDCRect& rect);
     void screenDolly(int x, int y);
     

@@ -47,6 +47,12 @@ struct CADViewerBridgeView: UIViewControllerRepresentable {
             }
         }
 
+        func cadController(_ controller: CADBaseViewController, didMeasureScreenPoint screenPoint: CGPoint, worldCoordinate: CADMeasurementCoordinate) {
+            Task { @MainActor in
+                self.viewModel.handleMeasuredPoint(screenPoint: screenPoint, worldCoordinate: worldCoordinate)
+            }
+        }
+
         func cadController(_ controller: CADBaseViewController, didEmitMessageWithTitle title: String, message: String?) {
             Task { @MainActor in
                 self.viewModel.receiveMessage(title: title, message: message ?? "")

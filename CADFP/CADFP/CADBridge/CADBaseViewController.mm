@@ -7,6 +7,32 @@
 #import "CADEngineBootstrap.h"
 #import "RenderViewController.h"
 
+#include "../../可视化真机/Drawing/Include/DbBlockReference.h"
+#include "../../可视化真机/Drawing/Include/DbBlockTableRecord.h"
+#include "../../可视化真机/Drawing/Include/DbDatabase.h"
+#include "../../可视化真机/Drawing/Include/DbDatabaseReactor.h"
+#include "../../可视化真机/Drawing/Include/DbDictionary.h"
+#include "../../可视化真机/Drawing/Include/DbGsManager.h"
+#include "../../可视化真机/Drawing/Include/DbHostAppServices.h"
+#include "../../可视化真机/Drawing/Include/DbLayout.h"
+#include "../../可视化真机/Drawing/Include/DbMText.h"
+#include "../../可视化真机/Drawing/Include/DbObjectIterator.h"
+#include "../../可视化真机/Drawing/Include/DbSystemServices.h"
+#include "../../可视化真机/Drawing/Include/DbText.h"
+#include "../../可视化真机/Drawing/Include/GiContextForDbDatabase.h"
+#include "../../可视化真机/Drawing/Include/HatchPatternManager.h"
+#include "../../可视化真机/Drawing/Extensions/ExServices/ExHostAppServices.h"
+#include "../../可视化真机/Kernel/Include/Ge/GeExtents3d.h"
+#include "../../可视化真机/Kernel/Include/Ge/GeMatrix3d.h"
+#include "../../可视化真机/Kernel/Include/Ge/GePoint3dArray.h"
+
+#include "ExSystemServices.h"
+#include "OdError.h"
+#include "StaticRxObject.h"
+
+#include <cmath>
+#include <vector>
+
 @interface CADBaseViewController () {
     TviCore _tvCore;
     TviGlobalParameters *_globalParams;
@@ -59,6 +85,270 @@ static OdUInt8 CADClampedMarkupWeight(NSInteger value)
     return (OdUInt8)value;
 }
 
+namespace {
+
+class CADTextExtractionServices : public ExSystemServices, public ExHostAppServices
+{
+protected:
+    ODRX_USING_HEAP_OPERATORS(ExSystemServices);
+
+public:
+    OdGsDevicePtr gsBitmapDevice(
+        OdRxObject* pViewObj = NULL,
+        OdDbBaseDatabase* pDb = NULL,
+        OdUInt32 flags = 0
+    ) ODRX_OVERRIDE
+    {
+        (void)pViewObj;
+        (void)pDb;
+        (void)flags;
+        return OdGsDevicePtr();
+    }
+};
+
+struct CADDatabaseTextRecord {
+    OdString value;
+    OdGePoint3dArray points;
+};
+
+CADTextExtractionServices *CADSharedTextExtractionServices()
+{
+    static OdStaticRxObject<CADTextExtractionServices> services;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        odInitialize(&services);
+    });
+    return &services;
+}
+
+OdDbDatabasePtr CADReadTextDatabase(NSString *filePath)
+{
+    if (filePath.length == 0) {
+        return OdDbDatabasePtr();
+    }
+
+    CADTextExtractionServices *services = CADSharedTextExtractionServices();
+    try {
+        return services->readFile(NSString2OdString(filePath), false, false, Oda::kShareDenyNo);
+    } catch (const OdError &) {
+        return OdDbDatabasePtr();
+    } catch (...) {
+        return OdDbDatabasePtr();
+    }
+}
+
+void CADAppendTransformedPoint(OdGePoint3dArray &points, OdGePoint3d point, const OdGeMatrix3d &transform)
+{
+    point.transformBy(transform);
+    points.append(point);
+}
+
+void CADAppendEntityExtents(const OdDbEntityPtr &entity, const OdGeMatrix3d &transform, OdGePoint3dArray &points)
+{
+    if (entity.isNull()) {
+        return;
+    }
+
+    try {
+        OdGeExtents3d extents;
+        if (entity->getGeomExtents(extents) != eOk) {
+            return;
+        }
+
+        const OdGePoint3d minPoint = extents.minPoint();
+        const OdGePoint3d maxPoint = extents.maxPoint();
+        CADAppendTransformedPoint(points, minPoint, transform);
+        CADAppendTransformedPoint(points, maxPoint, transform);
+        CADAppendTransformedPoint(points, OdGePoint3d(minPoint.x, maxPoint.y, minPoint.z), transform);
+        CADAppendTransformedPoint(points, OdGePoint3d(maxPoint.x, minPoint.y, maxPoint.z), transform);
+    } catch (const OdError &) {
+    } catch (...) {
+    }
+}
+
+void CADAppendTextRecord(
+    std::vector<CADDatabaseTextRecord> &records,
+    const OdString &value,
+    const OdGePoint3dArray &points
+)
+{
+    if (value.isEmpty() || points.empty()) {
+        return;
+    }
+
+    CADDatabaseTextRecord record;
+    record.value = value;
+    record.points = points;
+    records.push_back(record);
+}
+
+void CADCollectTextEntity(
+    const OdDbEntityPtr &entity,
+    const OdGeMatrix3d &transform,
+    std::vector<CADDatabaseTextRecord> &records
+)
+{
+    if (entity.isNull()) {
+        return;
+    }
+
+    OdDbMTextPtr mText = OdDbMText::cast(entity);
+    if (!mText.isNull()) {
+        OdString value = mText->text();
+        if (value.isEmpty()) {
+            value = mText->contents();
+        }
+
+        OdGePoint3dArray points;
+        CADAppendTransformedPoint(points, mText->location(), transform);
+        try {
+            OdGePoint3dArray bounds;
+            mText->getActualBoundingPoints(bounds);
+            for (OdUInt32 index = 0; index < bounds.size(); index++) {
+                CADAppendTransformedPoint(points, bounds[index], transform);
+            }
+        } catch (const OdError &) {
+        } catch (...) {
+        }
+        CADAppendEntityExtents(entity, transform, points);
+        CADAppendTextRecord(records, value, points);
+        return;
+    }
+
+    OdDbTextPtr text = OdDbText::cast(entity);
+    if (!text.isNull()) {
+        OdGePoint3dArray points;
+        CADAppendTransformedPoint(points, text->position(), transform);
+        CADAppendEntityExtents(entity, transform, points);
+        CADAppendTextRecord(records, text->textString(), points);
+    }
+}
+
+void CADCollectTextsFromBlock(
+    const OdDbBlockTableRecordPtr &block,
+    const OdGeMatrix3d &transform,
+    std::vector<CADDatabaseTextRecord> &records,
+    int depth
+)
+{
+    if (block.isNull() || depth > 12) {
+        return;
+    }
+
+    OdDbObjectIteratorPtr iterator = block->newIterator();
+    for (; !iterator->done(); iterator->step()) {
+        OdDbEntityPtr entity = iterator->entity(OdDb::kForRead);
+        if (entity.isNull()) {
+            continue;
+        }
+
+        CADCollectTextEntity(entity, transform, records);
+
+        OdDbBlockReferencePtr blockReference = OdDbBlockReference::cast(entity);
+        if (blockReference.isNull()) {
+            continue;
+        }
+
+        OdDbObjectIteratorPtr attributeIterator = blockReference->attributeIterator();
+        for (; !attributeIterator->done(); attributeIterator->step()) {
+            OdDbEntityPtr attributeEntity = attributeIterator->entity(OdDb::kForRead);
+            CADCollectTextEntity(attributeEntity, transform, records);
+        }
+
+        OdDbBlockTableRecordPtr nestedBlock = blockReference->blockTableRecord().safeOpenObject(OdDb::kForRead);
+        if (!nestedBlock.isNull()) {
+            CADCollectTextsFromBlock(nestedBlock, blockReference->blockTransform() * transform, records, depth + 1);
+        }
+    }
+}
+
+std::vector<CADDatabaseTextRecord> CADCollectTextRecords(NSString *filePath)
+{
+    std::vector<CADDatabaseTextRecord> records;
+    OdDbDatabasePtr database = CADReadTextDatabase(filePath);
+    if (database.isNull()) {
+        return records;
+    }
+
+    OdDbObjectId modelSpaceId = database->getModelSpaceId();
+    OdDbBlockTableRecordPtr modelSpace = modelSpaceId.safeOpenObject(OdDb::kForRead);
+    CADCollectTextsFromBlock(modelSpace, OdGeMatrix3d::kIdentity, records, 0);
+
+    OdDbObjectId activeLayoutId = database->getActiveLayoutBTRId();
+    if (!activeLayoutId.isNull() && activeLayoutId != modelSpaceId) {
+        OdDbBlockTableRecordPtr activeLayout = activeLayoutId.safeOpenObject(OdDb::kForRead);
+        CADCollectTextsFromBlock(activeLayout, OdGeMatrix3d::kIdentity, records, 0);
+    }
+
+    return records;
+}
+
+BOOL CADTextRecordIntersectsViewRect(
+    const CADDatabaseTextRecord &record,
+    CGRect pixelRect,
+    const OdGeMatrix3d &worldToDevice
+)
+{
+    BOOL hasPoint = NO;
+    double minX = 0.0;
+    double minY = 0.0;
+    double maxX = 0.0;
+    double maxY = 0.0;
+
+    for (OdUInt32 index = 0; index < record.points.size(); index++) {
+        OdGePoint3d screenPoint = record.points[index];
+        screenPoint.transformBy(worldToDevice);
+
+        if (!hasPoint) {
+            minX = screenPoint.x;
+            maxX = screenPoint.x;
+            minY = screenPoint.y;
+            maxY = screenPoint.y;
+            hasPoint = YES;
+        } else {
+            minX = MIN(minX, screenPoint.x);
+            maxX = MAX(maxX, screenPoint.x);
+            minY = MIN(minY, screenPoint.y);
+            maxY = MAX(maxY, screenPoint.y);
+        }
+    }
+
+    if (!hasPoint) {
+        return NO;
+    }
+
+    CGRect recordRect = CGRectInset(CGRectMake(minX, minY, maxX - minX, maxY - minY), -2.0, -2.0);
+    return CGRectIntersectsRect(recordRect, pixelRect);
+}
+
+CGRect CADPixelRectFromViewRect(CGRect viewRect)
+{
+    CGFloat scale = UIScreen.mainScreen.scale;
+    return CGRectStandardize(CGRectMake(
+        CGRectGetMinX(viewRect) * scale,
+        CGRectGetMinY(viewRect) * scale,
+        CGRectGetWidth(viewRect) * scale,
+        CGRectGetHeight(viewRect) * scale
+    ));
+}
+
+} // namespace
+
+@implementation CADMeasurementCoordinate
+
+- (instancetype)initWithX:(double)x y:(double)y z:(double)z
+{
+    self = [super init];
+    if (self) {
+        _x = x;
+        _y = y;
+        _z = z;
+    }
+    return self;
+}
+
+@end
+
 @implementation CADBaseViewController
 
 - (instancetype)initWithFilePath:(NSString *)filePath
@@ -68,7 +358,7 @@ static OdUInt8 CADClampedMarkupWeight(NSInteger value)
         _filePath = [filePath copy];
         _ready = NO;
         _markupsHidden = NO;
-        _pendingMarkupTextScale = 1.0;
+        _pendingMarkupTextScale = 0.0;
         _globalParams = new TviGlobalParameters();
         _globalParams->setDevice(TviGlobalParameters::OpenGLES2);
         _globalParams->setPartialOpen(false);
@@ -309,6 +599,81 @@ static OdUInt8 CADClampedMarkupWeight(NSInteger value)
     _tvCore.runNavigationAction(TviCore::ZoomExtents);
 }
 
+- (void)setViewRotationDegrees:(NSInteger)degrees
+{
+    if (!self.isReady) {
+        return;
+    }
+
+    OdTvGsViewPtr viewPtr = _tvCore.getActiveTvViewPtr();
+    if (viewPtr.isNull()) {
+        return;
+    }
+
+    NSInteger normalizedDegrees = degrees % 360;
+    if (normalizedDegrees < 0) {
+        normalizedDegrees += 360;
+    }
+
+    OdTvPoint position = viewPtr->position();
+    OdTvPoint target = viewPtr->target();
+    OdTvVector viewDirection = position - target;
+    if (viewDirection.length() < 1.0e-9) {
+        viewDirection = OdTvVector(0.0, 0.0, 1.0);
+    } else {
+        viewDirection.normalize();
+    }
+
+    OdTvVector upVector(0.0, 1.0, 0.0);
+    if (fabs(upVector.dotProduct(viewDirection)) > 0.999) {
+        upVector = OdTvVector(1.0, 0.0, 0.0);
+    }
+
+    const double radians = (double)normalizedDegrees * M_PI / 180.0;
+    OdGeMatrix3d rotationMatrix = OdGeMatrix3d::rotation(radians, viewDirection, target);
+    upVector.transformBy(rotationMatrix);
+
+    viewPtr->setView(position,
+                     target,
+                     upVector,
+                     viewPtr->fieldWidth(),
+                     viewPtr->fieldHeight(),
+                     viewPtr->isPerspective() ? OdTvGsView::kPerspective : OdTvGsView::kParallel);
+    _tvCore.update();
+}
+
+- (void)setDrawingBackgroundWithRed:(NSInteger)red green:(NSInteger)green blue:(NSInteger)blue
+{
+    OdUInt8 r = CADClampedColorComponent(red);
+    OdUInt8 g = CADClampedColorComponent(green);
+    OdUInt8 b = CADClampedColorComponent(blue);
+    UIColor *backgroundColor = [UIColor colorWithRed:r / 255.0
+                                               green:g / 255.0
+                                                blue:b / 255.0
+                                               alpha:1.0];
+    self.view.backgroundColor = backgroundColor;
+    self.renderContainerView.backgroundColor = backgroundColor;
+    self.renderViewController.view.backgroundColor = backgroundColor;
+
+    if (!self.isReady) {
+        return;
+    }
+
+    OdTvGsViewPtr viewPtr = _tvCore.getActiveTvViewPtr();
+    if (viewPtr.isNull()) {
+        return;
+    }
+
+    OdTvGsDeviceId deviceId = viewPtr->device();
+    OdTvGsDevicePtr devicePtr = deviceId.openObject(OdTv::kForWrite);
+    if (devicePtr.isNull()) {
+        return;
+    }
+
+    devicePtr->setBackgroundColor(ODRGB(r, g, b));
+    _tvCore.update();
+}
+
 - (void)activateMarkupTool:(CADMarkupTool)tool
 {
     if (!self.isReady) {
@@ -317,7 +682,7 @@ static OdUInt8 CADClampedMarkupWeight(NSInteger value)
 
     if (tool != CADMarkupToolText) {
         _pendingMarkupText = nil;
-        _pendingMarkupTextScale = 1.0;
+        _pendingMarkupTextScale = 0.0;
     }
 
     if (_markupsHidden) {
@@ -345,13 +710,13 @@ static OdUInt8 CADClampedMarkupWeight(NSInteger value)
 
 - (void)activateTextMarkupWithText:(NSString *)text
 {
-    [self activateTextMarkupWithText:text textSize:1.0];
+    [self activateTextMarkupWithText:text textSize:0.0];
 }
 
 - (void)activateTextMarkupWithText:(NSString *)text textSize:(double)textSize
 {
     _pendingMarkupText = [text copy];
-    _pendingMarkupTextScale = textSize > 0 ? textSize : 1.0;
+    _pendingMarkupTextScale = textSize > 0 ? textSize : 0.0;
     [self activateMarkupTool:CADMarkupToolText];
 }
 
@@ -372,7 +737,7 @@ static OdUInt8 CADClampedMarkupWeight(NSInteger value)
     }
 
     _pendingMarkupText = nil;
-    _pendingMarkupTextScale = 1.0;
+    _pendingMarkupTextScale = 0.0;
     _tvCore.finishDragger();
 }
 
@@ -390,13 +755,15 @@ static OdUInt8 CADClampedMarkupWeight(NSInteger value)
     _tvCore.update();
 }
 
-- (void)requestExtractedTexts
+- (void)publishExtractedTextItems:(NSArray<NSString *> *)textItems
 {
-    if (!self.isReady) {
-        return;
+    if ([self.delegate respondsToSelector:@selector(cadController:didExtractTextItems:)]) {
+        [self.delegate cadController:self didExtractTextItems:textItems];
     }
+}
 
-    _tvCore.searchDBDataContent();
+- (void)publishExtractedTexts
+{
     NSMutableArray<NSString *> *texts = [NSMutableArray array];
     const std::vector<OdString> &extractedTexts = _tvCore.getExtractedTexts();
     for (const OdString &text : extractedTexts) {
@@ -406,9 +773,124 @@ static OdUInt8 CADClampedMarkupWeight(NSInteger value)
         }
     }
 
-    if ([self.delegate respondsToSelector:@selector(cadController:didExtractTextItems:)]) {
-        [self.delegate cadController:self didExtractTextItems:texts];
+    [self publishExtractedTextItems:texts];
+}
+
+- (NSArray<NSString *> *)databaseExtractedTextItemsInViewRect:(CGRect)rect shouldFilter:(BOOL)shouldFilter
+{
+    std::vector<CADDatabaseTextRecord> records = CADCollectTextRecords(self.filePath);
+    if (records.empty()) {
+        return @[];
     }
+
+    OdGeMatrix3d worldToDevice = OdGeMatrix3d::kIdentity;
+    CGRect pixelRect = CGRectNull;
+    if (shouldFilter) {
+        OdTvGsViewPtr viewPtr = _tvCore.getActiveTvViewPtr();
+        if (viewPtr.isNull()) {
+            return @[];
+        }
+
+        pixelRect = CADPixelRectFromViewRect(rect);
+        if (CGRectIsEmpty(pixelRect) || CGRectIsNull(pixelRect)) {
+            return @[];
+        }
+
+        worldToDevice = viewPtr->worldToDeviceMatrix();
+    }
+
+    NSMutableArray<NSString *> *texts = [NSMutableArray array];
+    for (const CADDatabaseTextRecord &record : records) {
+        if (shouldFilter && !CADTextRecordIntersectsViewRect(record, pixelRect, worldToDevice)) {
+            continue;
+        }
+
+        NSString *value = OdString2NSString(record.value);
+        if (value.length > 0) {
+            [texts addObject:value];
+        }
+    }
+
+    return texts;
+}
+
+- (void)requestExtractedTexts
+{
+    if (!self.isReady) {
+        [self publishExtractedTextItems:@[]];
+        return;
+    }
+
+    NSArray<NSString *> *databaseTexts = [self databaseExtractedTextItemsInViewRect:CGRectNull shouldFilter:NO];
+    if (databaseTexts.count > 0) {
+        [self publishExtractedTextItems:databaseTexts];
+        return;
+    }
+
+    _tvCore.searchDBDataContent();
+    [self publishExtractedTexts];
+}
+
+- (void)requestExtractedTextsInViewRect:(CGRect)rect
+{
+    if (!self.isReady) {
+        [self publishExtractedTextItems:@[]];
+        return;
+    }
+
+    if (CGRectIsEmpty(rect) || CGRectIsNull(rect)) {
+        [self requestExtractedTexts];
+        return;
+    }
+
+    NSArray<NSString *> *databaseTexts = [self databaseExtractedTextItemsInViewRect:rect shouldFilter:YES];
+    if (databaseTexts.count > 0) {
+        [self publishExtractedTextItems:databaseTexts];
+        return;
+    }
+
+    NSArray<NSString *> *allDatabaseTexts = [self databaseExtractedTextItemsInViewRect:CGRectNull shouldFilter:NO];
+    if (allDatabaseTexts.count > 0) {
+        [self publishExtractedTextItems:allDatabaseTexts];
+        return;
+    }
+
+    CGPoint corners[] = {
+        CGPointMake(CGRectGetMinX(rect), CGRectGetMinY(rect)),
+        CGPointMake(CGRectGetMaxX(rect), CGRectGetMinY(rect)),
+        CGPointMake(CGRectGetMinX(rect), CGRectGetMaxY(rect)),
+        CGPointMake(CGRectGetMaxX(rect), CGRectGetMaxY(rect))
+    };
+
+    BOOL didResolveWorldRect = NO;
+    double minX = 0.0;
+    double minY = 0.0;
+    double maxX = 0.0;
+    double maxY = 0.0;
+
+    for (NSUInteger index = 0; index < 4; index++) {
+        CADMeasurementCoordinate *coordinate = [self worldCoordinateForViewPoint:corners[index]];
+        if (!coordinate) {
+            [self requestExtractedTexts];
+            return;
+        }
+
+        if (!didResolveWorldRect) {
+            minX = coordinate.x;
+            maxX = coordinate.x;
+            minY = coordinate.y;
+            maxY = coordinate.y;
+            didResolveWorldRect = YES;
+        } else {
+            minX = MIN(minX, coordinate.x);
+            maxX = MAX(maxX, coordinate.x);
+            minY = MIN(minY, coordinate.y);
+            maxY = MAX(maxY, coordinate.y);
+        }
+    }
+
+    _tvCore.searchDBDataContent(minX, minY, maxX, maxY);
+    [self publishExtractedTexts];
 }
 
 - (void)showMessage:(NSString *)title message:(NSString *)msg
@@ -487,6 +969,22 @@ static OdUInt8 CADClampedMarkupWeight(NSInteger value)
     return wcsPoint;
 }
 
+- (CADMeasurementCoordinate *)worldCoordinateForViewPoint:(CGPoint)point
+{
+    if (!self.isReady) {
+        return nil;
+    }
+
+    OdTvGsViewPtr viewPtr = _tvCore.getActiveTvViewPtr();
+    if (viewPtr.isNull()) {
+        return nil;
+    }
+
+    CGPoint touchPoint = [self setupPoint:point];
+    OdGePoint3d worldPoint = [self toEyeToWorld:(int)touchPoint.x yPos:(int)touchPoint.y viewPtr:viewPtr];
+    return [[CADMeasurementCoordinate alloc] initWithX:worldPoint.x y:worldPoint.y z:worldPoint.z];
+}
+
 - (void)prepareTextMarkupViewForTouchPoint:(CGPoint)touchPoint
 {
     OdTvGsViewPtr viewPtr = _tvCore.getActiveTvViewPtr();
@@ -519,7 +1017,9 @@ static OdUInt8 CADClampedMarkupWeight(NSInteger value)
             OdTvTextDataPtr textData = textRowId.openAsText();
             if (!textData.isNull()) {
                 textData->setString(NSString2OdString(text ?: @""));
-                textData->setTextSize(_pendingMarkupTextScale);
+                if (_pendingMarkupTextScale > 0.0) {
+                    textData->setTextSize(_pendingMarkupTextScale);
+                }
             }
         }
     }
@@ -531,12 +1031,21 @@ static OdUInt8 CADClampedMarkupWeight(NSInteger value)
     }
 
     _tvCore.finishDragger();
-    _pendingMarkupTextScale = 1.0;
+    _pendingMarkupTextScale = 0.0;
     _tvCore.update();
 }
 
 - (void)onTouchEvent:(UITapGestureRecognizer *)sender
 {
+    if (self.isMeasurementModeEnabled) {
+        CGPoint screenPoint = [sender locationInView:self.renderContainerView];
+        CADMeasurementCoordinate *worldCoordinate = [self worldCoordinateForViewPoint:screenPoint];
+        if (worldCoordinate && [self.delegate respondsToSelector:@selector(cadController:didMeasureScreenPoint:worldCoordinate:)]) {
+            [self.delegate cadController:self didMeasureScreenPoint:screenPoint worldCoordinate:worldCoordinate];
+        }
+        return;
+    }
+
     OdTvDragger *dragger = _tvCore.getActiveDragger();
     if (!dragger) {
         return;

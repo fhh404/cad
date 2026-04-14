@@ -3,6 +3,8 @@ import SwiftUI
 struct CADViewerScreen: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel: CADViewerViewModel
+    @State private var textExtractionSelectionDragStartRect: CGRect?
+    @State private var textExtractionSelectionResizeStartRect: CGRect?
 
     private let filePath: String
 
@@ -23,6 +25,11 @@ struct CADViewerScreen: View {
                     .zIndex(0.5)
             }
 
+            if viewModel.isMeasurementToolbarPresented {
+                measurementOverlay
+                    .zIndex(0.75)
+            }
+
             if viewModel.isMarkupSubpanelPresented {
                 markupSubpanelDismissOverlay
                     .zIndex(1)
@@ -40,6 +47,12 @@ struct CADViewerScreen: View {
                     .zIndex(2)
             }
 
+            if viewModel.isTextExtractionOverlayPresented {
+                textExtractionOverlay
+                    .transition(.opacity)
+                    .zIndex(2.5)
+            }
+
             VStack(spacing: 0) {
                 headerBar
                 Spacer()
@@ -49,9 +62,6 @@ struct CADViewerScreen: View {
         }
         .toolbar(.hidden, for: .navigationBar)
         .toolbar(.hidden, for: .tabBar)
-        .sheet(isPresented: $viewModel.isTextSheetPresented) {
-            textSheet
-        }
         .alert(item: $viewModel.alertMessage) { alert in
             Alert(
                 title: Text(alert.title),
@@ -60,10 +70,13 @@ struct CADViewerScreen: View {
             )
         }
         .animation(.easeInOut(duration: 0.2), value: viewModel.isMarkupToolbarPresented)
+        .animation(.easeInOut(duration: 0.2), value: viewModel.isMeasurementToolbarPresented)
         .animation(.easeInOut(duration: 0.2), value: viewModel.isMarkupTextInputPresented)
         .animation(.easeInOut(duration: 0.2), value: viewModel.activeMarkupStylePanel)
         .animation(.easeInOut(duration: 0.2), value: viewModel.isHotspotInputPresented)
         .animation(.easeInOut(duration: 0.2), value: viewModel.isLayerSheetPresented)
+        .animation(.easeInOut(duration: 0.2), value: viewModel.isTextExtractionOverlayPresented)
+        .animation(.easeInOut(duration: 0.2), value: viewModel.isSettingsPanelPresented)
     }
 
     private var headerBar: some View {
@@ -102,8 +115,14 @@ struct CADViewerScreen: View {
 
     @ViewBuilder
     private var bottomChrome: some View {
-        if viewModel.isMarkupToolbarPresented {
+        if viewModel.isTextExtractionOverlayPresented {
+            EmptyView()
+        } else if viewModel.isMeasurementToolbarPresented {
+            measurementToolbar
+        } else if viewModel.isMarkupToolbarPresented {
             markupBottomChrome
+        } else if viewModel.isSettingsPanelPresented {
+            settingsPanel
         } else {
             defaultBottomToolbar
         }
@@ -152,6 +171,143 @@ struct CADViewerScreen: View {
         )
         .padding(.horizontal, 16)
         .padding(.bottom, 31)
+    }
+
+    private var measurementToolbar: some View {
+        HStack(spacing: 0) {
+            ForEach(CADMeasurementToolbarItemKind.allCases) { item in
+                measurementToolbarButton(item)
+            }
+        }
+        .frame(height: 66)
+        .frame(maxWidth: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(Color.cadToolbarBackground)
+        )
+        .padding(.horizontal, 16)
+        .padding(.bottom, 31)
+    }
+
+    private var settingsPanel: some View {
+        VStack(spacing: 0) {
+            HStack(spacing: 0) {
+                Button {
+                    viewModel.dismissSettingsPanel()
+                } label: {
+                    Image("返回 (2) 1")
+                        .resizable()
+                        .renderingMode(.template)
+                        .scaledToFit()
+                        .foregroundStyle(.white)
+                        .frame(width: 24, height: 24)
+                        .frame(width: 44, height: 44)
+                }
+                .buttonStyle(.plain)
+
+                Spacer()
+
+                Text("设置")
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundStyle(.white)
+
+                Spacer()
+
+                Color.clear
+                    .frame(width: 44, height: 44)
+            }
+            .frame(height: 44)
+
+            HStack(spacing: 0) {
+                Text("旋转")
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundStyle(.white)
+                    .frame(width: 84, alignment: .leading)
+
+                Spacer()
+
+                settingsRotationButton(systemName: "arrow.counterclockwise") {
+                    viewModel.rotateSettingsViewCounterclockwise()
+                }
+
+                Text("\(viewModel.settingsRotationDegrees)°")
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundStyle(.white)
+                    .frame(width: 64, height: 28)
+                    .background(
+                        RoundedRectangle(cornerRadius: 6, style: .continuous)
+                            .fill(Color.cadFieldBackground)
+                    )
+                    .padding(.horizontal, 14)
+
+                settingsRotationButton(systemName: "arrow.clockwise") {
+                    viewModel.rotateSettingsViewClockwise()
+                }
+            }
+            .frame(height: 56)
+            .padding(.horizontal, 20)
+
+            HStack(spacing: 0) {
+                Text("背景")
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundStyle(.white)
+                    .frame(width: 84, alignment: .leading)
+
+                Spacer()
+
+                HStack(spacing: 8) {
+                    ForEach(CADViewerSettingsBackgroundOption.allCases) { option in
+                        settingsBackgroundOptionButton(option)
+                    }
+                }
+            }
+            .frame(height: 65)
+            .padding(.horizontal, 20)
+        }
+        .frame(height: 165)
+        .frame(maxWidth: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(Color.cadToolbarBackground)
+        )
+        .padding(.horizontal, 16)
+        .padding(.bottom, 31)
+    }
+
+    private func settingsRotationButton(systemName: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: systemName)
+                .font(.system(size: 20, weight: .semibold))
+                .foregroundStyle(.white)
+                .frame(width: 20, height: 28)
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func settingsBackgroundOptionButton(_ option: CADViewerSettingsBackgroundOption) -> some View {
+        let isSelected = viewModel.selectedSettingsBackground == option
+
+        return Button {
+            viewModel.selectSettingsBackground(option)
+        } label: {
+            ZStack {
+                if isSelected {
+                    Circle()
+                        .stroke(.black, lineWidth: 2)
+                        .frame(width: 34, height: 34)
+                }
+
+                Circle()
+                    .fill(settingsBackgroundColor(option))
+                    .frame(width: 24, height: 24)
+                    .overlay(
+                        Circle()
+                            .stroke(option == .black ? Color.white.opacity(0.35) : Color.clear, lineWidth: 1)
+                    )
+            }
+            .frame(width: 34, height: 34)
+        }
+        .buttonStyle(.plain)
     }
 
     private var markupTextInputPanel: some View {
@@ -370,6 +526,15 @@ struct CADViewerScreen: View {
         )
     }
 
+    private func settingsBackgroundColor(_ option: CADViewerSettingsBackgroundOption) -> Color {
+        let rgb = option.rgb
+        return Color(
+            red: Double(rgb.red) / 255,
+            green: Double(rgb.green) / 255,
+            blue: Double(rgb.blue) / 255
+        )
+    }
+
     private var layerPanelOverlay: some View {
         VStack(spacing: 0) {
             Color.clear
@@ -460,6 +625,239 @@ struct CADViewerScreen: View {
         .presentationDragIndicator(.visible)
     }
 
+    private var textExtractionOverlay: some View {
+        GeometryReader { proxy in
+            let canvasSize = proxy.size
+            let selectionRect = CADTextExtractionSelectionGeometry.denormalized(
+                viewModel.textExtractionSelectionRect,
+                in: canvasSize
+            )
+
+            ZStack(alignment: .topLeading) {
+                Color.black.opacity(0.001)
+                    .ignoresSafeArea()
+
+                textExtractionSelectionBox(selectionRect, canvasSize: canvasSize)
+
+                ForEach(CADTextExtractionSelectionHandle.allCases) { handle in
+                    textExtractionResizeHandle(handle, selectionRect: selectionRect, canvasSize: canvasSize)
+                        .position(textExtractionHandlePosition(handle, in: selectionRect))
+                }
+
+                textExtractionActionButtons(selectionRect: selectionRect, canvasSize: canvasSize)
+
+                textExtractionResultPanel
+                    .frame(width: max(canvasSize.width - 32, 0), height: 254)
+                    .position(x: canvasSize.width / 2, y: canvasSize.height - 31 - 127)
+            }
+            .frame(width: canvasSize.width, height: canvasSize.height)
+        }
+        .ignoresSafeArea()
+    }
+
+    private func textExtractionSelectionBox(_ rect: CGRect, canvasSize: CGSize) -> some View {
+        Rectangle()
+            .fill(Color.cadTextExtractionSelectionFill)
+            .overlay(
+                Rectangle()
+                    .stroke(Color.cadActiveBlue, lineWidth: 2)
+            )
+            .shadow(color: .black.opacity(0.25), radius: 2, x: 0, y: 4)
+            .frame(width: rect.width, height: rect.height)
+            .position(x: rect.midX, y: rect.midY)
+            .contentShape(Rectangle())
+            .gesture(
+                DragGesture(minimumDistance: 0)
+                    .onChanged { value in
+                        if textExtractionSelectionDragStartRect == nil {
+                            textExtractionSelectionDragStartRect = rect
+                        }
+
+                        let movedRect = CADTextExtractionSelectionGeometry.moved(
+                            textExtractionSelectionDragStartRect ?? rect,
+                            by: value.translation,
+                            in: canvasSize
+                        )
+                        viewModel.updateTextExtractionSelection(movedRect, in: canvasSize)
+                    }
+                    .onEnded { _ in
+                        textExtractionSelectionDragStartRect = nil
+                    }
+            )
+    }
+
+    private func textExtractionResizeHandle(
+        _ handle: CADTextExtractionSelectionHandle,
+        selectionRect: CGRect,
+        canvasSize: CGSize
+    ) -> some View {
+        Circle()
+            .fill(.white)
+            .overlay(
+                Circle()
+                    .stroke(Color.cadActiveBlue, lineWidth: 2)
+            )
+            .frame(width: 8, height: 8)
+            .frame(width: 32, height: 32)
+            .contentShape(Rectangle())
+            .gesture(
+                DragGesture(minimumDistance: 0)
+                    .onChanged { value in
+                        if textExtractionSelectionResizeStartRect == nil {
+                            textExtractionSelectionResizeStartRect = selectionRect
+                        }
+
+                        let resizedRect = CADTextExtractionSelectionGeometry.resized(
+                            textExtractionSelectionResizeStartRect ?? selectionRect,
+                            handle: handle,
+                            by: value.translation,
+                            in: canvasSize
+                        )
+                        viewModel.updateTextExtractionSelection(resizedRect, in: canvasSize)
+                    }
+                    .onEnded { _ in
+                        textExtractionSelectionResizeStartRect = nil
+                    }
+            )
+    }
+
+    private func textExtractionHandlePosition(
+        _ handle: CADTextExtractionSelectionHandle,
+        in rect: CGRect
+    ) -> CGPoint {
+        switch handle {
+        case .topLeading:
+            return CGPoint(x: rect.minX, y: rect.minY)
+        case .top:
+            return CGPoint(x: rect.midX, y: rect.minY)
+        case .topTrailing:
+            return CGPoint(x: rect.maxX, y: rect.minY)
+        case .leading:
+            return CGPoint(x: rect.minX, y: rect.midY)
+        case .trailing:
+            return CGPoint(x: rect.maxX, y: rect.midY)
+        case .bottomLeading:
+            return CGPoint(x: rect.minX, y: rect.maxY)
+        case .bottom:
+            return CGPoint(x: rect.midX, y: rect.maxY)
+        case .bottomTrailing:
+            return CGPoint(x: rect.maxX, y: rect.maxY)
+        }
+    }
+
+    private func textExtractionActionButtons(selectionRect: CGRect, canvasSize: CGSize) -> some View {
+        let actionCenterX = min(max(selectionRect.maxX - 54, 54), max(canvasSize.width - 54, 54))
+        let actionCenterY = min(max(selectionRect.maxY + 33, 44), max(canvasSize.height - 44, 44))
+
+        return HStack(spacing: 8) {
+            Button {
+                viewModel.cancelTextExtraction()
+            } label: {
+                Text("取消")
+                    .font(.system(size: 10, weight: .regular))
+                    .foregroundStyle(.black)
+                    .frame(width: 50, height: 26)
+                    .background(
+                        RoundedRectangle(cornerRadius: 4, style: .continuous)
+                            .fill(Color.cadTextExtractionCancelBackground)
+                    )
+            }
+            .buttonStyle(.plain)
+
+            Button {
+                viewModel.confirmTextExtraction(in: canvasSize)
+            } label: {
+                Text("确定")
+                    .font(.system(size: 10, weight: .regular))
+                    .foregroundStyle(.white)
+                    .frame(width: 50, height: 26)
+                    .background(
+                        RoundedRectangle(cornerRadius: 4, style: .continuous)
+                            .fill(Color.cadActiveBlue)
+                    )
+            }
+            .buttonStyle(.plain)
+        }
+        .position(x: actionCenterX, y: actionCenterY)
+    }
+
+    private var textExtractionResultPanel: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(spacing: 0) {
+                Text("文字提取")
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundStyle(.white)
+
+                Spacer()
+
+                Button {
+                    viewModel.copyExtractedTexts()
+                } label: {
+                    Image(systemName: "doc.on.doc")
+                        .font(.system(size: 18, weight: .medium))
+                        .foregroundStyle(Color.cadActiveBlue)
+                        .frame(width: 32, height: 32)
+                }
+                .buttonStyle(.plain)
+            }
+            .frame(height: 32)
+            .padding(.top, 8)
+            .padding(.horizontal, 18)
+
+            textExtractionResultBox
+                .frame(height: 194)
+                .padding(.top, 4)
+                .padding(.horizontal, 16)
+
+            Spacer(minLength: 0)
+        }
+        .background(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(Color.cadToolbarBackground)
+        )
+    }
+
+    @ViewBuilder
+    private var textExtractionResultBox: some View {
+        ZStack(alignment: .topLeading) {
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .fill(Color.cadFieldBackground)
+
+            if viewModel.isExtractingTexts {
+                VStack(spacing: 12) {
+                    ProgressView()
+                        .tint(.white)
+
+                    Text("正在提取图纸中的文字内容...")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundStyle(Color.cadTextExtractionSecondaryText)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else if viewModel.extractedTexts.isEmpty {
+                Text(viewModel.hasTextExtractionAttempted ? "当前范围没有提取到文字" : "拖动蓝框选择文字范围后点击确定")
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundStyle(Color.cadTextExtractionSecondaryText)
+                    .padding(.horizontal, 12)
+                    .padding(.top, 12)
+            } else {
+                ScrollView {
+                    LazyVStack(alignment: .leading, spacing: 9) {
+                        ForEach(Array(viewModel.extractedTexts.enumerated()), id: \.offset) { _, text in
+                            Text(text)
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundStyle(Color.cadTextExtractionSecondaryText)
+                                .lineLimit(nil)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 11)
+                }
+                .scrollIndicators(.hidden)
+            }
+        }
+    }
+
     private func layerRow(layer: CADLayerItem, showsDisclosure: Bool) -> some View {
         Button {
             viewModel.toggleLayer(layer)
@@ -528,6 +926,198 @@ struct CADViewerScreen: View {
             .frame(maxWidth: item == .back ? 64 : .infinity, maxHeight: .infinity)
         }
         .buttonStyle(.plain)
+    }
+
+    private func measurementToolbarButton(_ item: CADMeasurementToolbarItemKind) -> some View {
+        let isActive = item.mode == viewModel.selectedMeasurementMode
+
+        return Button {
+            if let mode = item.mode {
+                viewModel.selectMeasurementMode(mode)
+            } else {
+                viewModel.dismissMeasurementPanel()
+            }
+        } label: {
+            VStack(spacing: item == .back ? 0 : 4) {
+                Image(item.iconName(isActive: isActive))
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: item == .back ? 24 : 22, height: item == .back ? 24 : 22)
+
+                if !item.title.isEmpty {
+                    Text(item.title)
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundStyle(isActive ? Color.cadActiveBlue : .white)
+                        .lineLimit(1)
+                }
+            }
+            .frame(maxWidth: item == .back ? 64 : .infinity, maxHeight: .infinity)
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var measurementOverlay: some View {
+        GeometryReader { proxy in
+            let samples = viewModel.measurementSamples
+
+            ZStack(alignment: .topLeading) {
+                measurementGeometryLayer(samples: samples, mode: viewModel.selectedMeasurementMode)
+
+                if viewModel.selectedMeasurementMode == .coordinate, samples.last != nil {
+                    coordinateMagnifier(in: proxy.size)
+                }
+
+                ForEach(samples) { sample in
+                    measurementMarker(isCoordinate: viewModel.selectedMeasurementMode == .coordinate)
+                        .position(sample.screenPoint)
+                }
+
+                measurementResultLayer(samples: samples, mode: viewModel.selectedMeasurementMode)
+            }
+            .frame(width: proxy.size.width, height: proxy.size.height)
+        }
+        .ignoresSafeArea()
+        .allowsHitTesting(false)
+    }
+
+    @ViewBuilder
+    private func measurementGeometryLayer(samples: [CADMeasurementSample], mode: CADMeasurementMode) -> some View {
+        switch mode {
+        case .length:
+            if samples.count >= 2, let first = samples.first, let second = samples.dropFirst().first {
+                Path { path in
+                    path.move(to: first.screenPoint)
+                    path.addLine(to: second.screenPoint)
+                }
+                .stroke(Color.cadMeasurementMagenta, lineWidth: 2)
+            }
+        case .area:
+            if samples.count >= 2 {
+                let areaPath = measurementPath(samples: samples, closePath: samples.count >= 3)
+                if samples.count >= 3 {
+                    areaPath
+                        .fill(Color.cadMeasurementMagenta.opacity(0.3))
+                }
+                areaPath
+                    .stroke(Color.cadMeasurementMagenta, lineWidth: 1.5)
+            }
+        case .coordinate:
+            EmptyView()
+        }
+    }
+
+    @ViewBuilder
+    private func measurementResultLayer(samples: [CADMeasurementSample], mode: CADMeasurementMode) -> some View {
+        switch mode {
+        case .length:
+            if let text = viewModel.measurementLengthText,
+               let first = samples.first,
+               let second = samples.dropFirst().first {
+                let center = midpoint(first.screenPoint, second.screenPoint)
+                Text(text)
+                    .font(.system(size: 18, weight: .bold))
+                    .italic()
+                    .foregroundStyle(.white)
+                    .position(x: center.x + 8, y: center.y + 28)
+            }
+        case .area:
+            if let text = viewModel.measurementAreaText {
+                let center = screenCentroid(samples)
+                Text(text)
+                    .font(.system(size: 18, weight: .bold))
+                    .italic()
+                    .foregroundStyle(.white)
+                    .position(center)
+            }
+        case .coordinate:
+            if let text = viewModel.measurementCoordinateText, let sample = samples.last {
+                Text(text)
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundStyle(Color.cadMeasurementMagenta)
+                    .multilineTextAlignment(.leading)
+                    .lineSpacing(2)
+                    .fixedSize(horizontal: true, vertical: true)
+                    .position(x: sample.screenPoint.x + 42, y: sample.screenPoint.y + 42)
+            }
+        }
+    }
+
+    private func measurementMarker(isCoordinate: Bool) -> some View {
+        ZStack {
+            if isCoordinate {
+                Circle()
+                    .stroke(Color.cadMeasurementMagenta, lineWidth: 2)
+                    .frame(width: 24, height: 24)
+            }
+
+            measurementCross(size: 10, lineWidth: 2)
+        }
+        .frame(width: isCoordinate ? 24 : 10, height: isCoordinate ? 24 : 10)
+    }
+
+    private func measurementCross(size: CGFloat, lineWidth: CGFloat) -> some View {
+        ZStack {
+            Rectangle()
+                .fill(Color.cadMeasurementMagenta)
+                .frame(width: size, height: lineWidth)
+
+            Rectangle()
+                .fill(Color.cadMeasurementMagenta)
+                .frame(width: lineWidth, height: size)
+        }
+        .frame(width: size, height: size)
+    }
+
+    private func coordinateMagnifier(in canvasSize: CGSize) -> some View {
+        let xScale = canvasSize.width / 393
+        let yScale = canvasSize.height / 852
+
+        return ZStack {
+            Rectangle()
+                .stroke(Color.cadActiveBlue, lineWidth: 2)
+
+            measurementMarker(isCoordinate: true)
+                .scaleEffect(1.16)
+        }
+        .frame(width: 118 * xScale, height: 168 * yScale)
+        .position(x: (26 + 59) * xScale, y: (100 + 84) * yScale)
+    }
+
+    private func measurementPath(samples: [CADMeasurementSample], closePath: Bool) -> Path {
+        var path = Path()
+        guard let first = samples.first else {
+            return path
+        }
+
+        path.move(to: first.screenPoint)
+        for sample in samples.dropFirst() {
+            path.addLine(to: sample.screenPoint)
+        }
+
+        if closePath {
+            path.closeSubpath()
+        }
+
+        return path
+    }
+
+    private func midpoint(_ first: CGPoint, _ second: CGPoint) -> CGPoint {
+        CGPoint(x: (first.x + second.x) / 2, y: (first.y + second.y) / 2)
+    }
+
+    private func screenCentroid(_ samples: [CADMeasurementSample]) -> CGPoint {
+        guard !samples.isEmpty else {
+            return .zero
+        }
+
+        let count = CGFloat(samples.count)
+        let sum = samples.reduce(CGPoint.zero) { partialResult, sample in
+            CGPoint(
+                x: partialResult.x + sample.screenPoint.x,
+                y: partialResult.y + sample.screenPoint.y
+            )
+        }
+        return CGPoint(x: sum.x / count, y: sum.y / count)
     }
 
     private var hotspotInputOverlay: some View {
@@ -682,12 +1272,14 @@ struct CADViewerScreen: View {
         case .markup:
             return viewModel.isMarkupToolbarPresented || viewModel.activeMarkup != nil
         case .measurement:
-            return false
+            return viewModel.isMeasurementToolbarPresented
         case .hideMarkup:
             return viewModel.isMarkupHidden
         case .textExtraction:
-            return viewModel.isTextSheetPresented
-        case .reset, .settings:
+            return viewModel.isTextExtractionOverlayPresented || viewModel.isTextSheetPresented
+        case .settings:
+            return viewModel.isSettingsPanelPresented
+        case .reset:
             return false
         }
     }
@@ -699,7 +1291,7 @@ struct CADViewerScreen: View {
         case .markup:
             viewModel.showMarkupPanel()
         case .measurement:
-            viewModel.showMeasurementPlaceholder()
+            viewModel.showMeasurementPanel()
         case .hideMarkup:
             viewModel.toggleMarkupsHidden()
         case .textExtraction:
@@ -707,7 +1299,7 @@ struct CADViewerScreen: View {
         case .reset:
             viewModel.resetView()
         case .settings:
-            viewModel.showSettingsPlaceholder()
+            viewModel.showSettingsPanel()
         }
     }
 }
@@ -716,6 +1308,10 @@ private extension Color {
     static let cadToolbarBackground = Color(red: 70 / 255, green: 70 / 255, blue: 78 / 255)
     static let cadFieldBackground = Color(red: 86 / 255, green: 86 / 255, blue: 96 / 255)
     static let cadActiveBlue = Color(red: 35 / 255, green: 99 / 255, blue: 254 / 255)
+    static let cadMeasurementMagenta = Color(red: 228 / 255, green: 48 / 255, blue: 204 / 255)
+    static let cadTextExtractionSelectionFill = Color(red: 35 / 255, green: 99 / 255, blue: 254 / 255).opacity(0.2)
+    static let cadTextExtractionCancelBackground = Color(red: 207 / 255, green: 207 / 255, blue: 207 / 255)
+    static let cadTextExtractionSecondaryText = Color(red: 183 / 255, green: 183 / 255, blue: 183 / 255)
 }
 
 private struct TopRoundedRectangle: Shape {
