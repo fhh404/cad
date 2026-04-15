@@ -112,16 +112,27 @@ struct ContentView: View {
                 }
             }
             .tabItem {
-                Label("首页", systemImage: "house.fill")
+                Label {
+                    Text("首页")
+                } icon: {
+                    Image(selectedTab == .home ? "Group 245" : "Group 246")
+                        .renderingMode(.original)
+                }
             }
             .tag(AppTab.home)
 
-            MyView()
-                .tabItem {
-                Label("我的", systemImage: "person.fill")
-            }
-            .tag(AppTab.profile)
+//            ProfileScreen()
+//                .tabItem {
+//                    Label {
+//                        Text("我的")
+//                    } icon: {
+//                        Image(selectedTab == .profile ? "Group 244" : "Group 243")
+//                            .renderingMode(.original)
+//                    }
+//                }
+//            .tag(AppTab.profile)
         }
+        .tint(Color(red: 35 / 255, green: 99 / 255, blue: 254 / 255))
         .fullScreenCover(isPresented: $showsWatermarkCamera) {
             WatermarkCameraScreen()
         }
@@ -153,36 +164,6 @@ struct ContentView: View {
 
         selectedTab = .home
         homePath.append(.importedConversion(kind, url))
-    }
-}
-
-private struct MyView: View {
-    var body: some View {
-        ZStack {
-            Color.white
-                .ignoresSafeArea()
-
-            VStack(spacing: 18) {
-                Spacer(minLength: 80)
-
-                Image("默认头像 (4) 1")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 96, height: 96)
-
-                Text("我的")
-                    .font(.system(size: 28, weight: .bold))
-                    .foregroundColor(Color(red: 36 / 255, green: 58 / 255, blue: 96 / 255))
-
-                Text("这里后续可以承接账号信息、最近项目和配置中心。")
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(Color(red: 140 / 255, green: 149 / 255, blue: 166 / 255))
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 36)
-
-                Spacer()
-            }
-        }
     }
 }
 

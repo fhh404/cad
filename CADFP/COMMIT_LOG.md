@@ -1,103 +1,124 @@
 # Git 提交日志
 
-## 最新提交 (2026-04-13)
+## 最新提交 (2026-04-15)
 
 ### 提交信息
-**Commit:** 2573fb03fde7902451d987b48a838f79849e6990  
+**Commit:** efadb42db789ecced1394713689b043cec49c0ac  
 **作者:** fhh404 <406138227@qq.com>  
-**日期:** 2026-04-13 19:13:17 +0800
+**日期:** 2026-04-15 02:16:30 +0800
 
 ### 提交标题
-feat: 增强单位转换功能和 CAD 查看器工具栏
+feat: 增强 CAD 查看器测量和文本提取功能
 
 ### 提交详情
-- 增强单位转换功能，支持外部文件导入和文档预览
-- 实现 CAD 转换桥接，支持 DWG/DXF 文件格式转换
-- 更新 CAD 查看器，添加工具栏功能
-- 更新导航架构，支持外部文件导入处理
-- 更新 CADBridge 核心模块
+- 增强测量工具，实现测量覆盖层和工具栏
+- 增强文本提取功能，支持文本选择和复制
+- 更新 CADBridge 核心，支持测量和文本提取
 - 完善测试和图标资源
 
 ### 文件变更统计
-- **68 个文件修改**
-- **3408 行新增**
-- **307 行删除**
+- **23 个文件修改**
+- **2111 行新增**
+- **93 行删除**
 
 ### 主要变更文件
 
-#### 增强单位转换功能（Conversion）
-- `ConversionScreen.swift` - 支持外部文件导入和文档预览（+446 行）
-- `ConversionModels.swift` - 添加 ConversionDocument 数据模型（+64 行）
-- `ConversionDocumentStore.swift` - 完整的转换文档存储管理（+73 行）
-- 支持的转换类型：
-  - 长度转换（米、千米、厘米、毫米、英里、码、英尺、英寸等）
-  - 面积转换（平方米、平方千米、平方英里、平方码、平方英尺、平方英寸、公顷、亩等）
-  - 体积转换（立方米、立方千米、立方英里、立方码、立方英尺、立方英寸、升、毫升、加仑、夸脱、品脱、杯、盎司等）
-  - 质量转换（千克、克、毫克、吨、磅、盎司、石等）
-  - 温度转换（摄氏度、华氏度、开尔文）
+#### 增强测量工具（Measurement）
+- **CADViewerScreen.swift** - 实现测量覆盖层和测量工具栏（+614 行）
+  - 测量覆盖层（measurementOverlay）
+  - 测量工具栏（measurementToolbar）
+  - 测量点选择和编辑功能
+  - 测量结果显示和格式化
+- **CADViewerViewModel.swift** - 测量工具栏状态管理（+572 行）
+  - isMeasurementToolbarPresented 状态
+  - 测量相关工具栏项处理
+  - 测量点选择和编辑逻辑
+- **支持的测量类型**：
+  - 距离测量
+  - 角度测量
+  - 半径测量
+  - 坐标测量
 
-#### 实现 CAD 转换桥接
-- `CADConversionBridge.h` - Objective-C 桥接头文件（25 行）
-- `CADConversionBridge.mm` - CAD 转换桥接实现（442 行）
-- `CADConversionEngine.swift` - Swift 转换引擎（177 行）
-- 支持 DWG/DXF 文件格式转换
-
-#### 更新 CAD 查看器（CADViewer）
-- `CADViewerScreen.swift` - 支持文件路径加载和工具栏（+717 行）
-- `CADViewerViewModel.swift` - 增强视图模型功能（+386 行）
-- 添加工具栏功能，支持更多交互操作
-
-#### 更新导航架构
-- `ContentView.swift` - 添加新路由（+60 行）
-  - `importedConversion` - 外部文件导入路由
-  - `conversionDocumentPreview` - 文档预览路由
-- 支持外部文件导入处理
-- 实现文档预览展示（CAD 文件或系统预览）
+#### 增强文本提取功能（Text Extraction）
+- **CADViewerScreen.swift** - 实现文本提取覆盖层
+  - 文本提取覆盖层（textExtractionOverlay）
+  - 文本选择功能（拖拽选择、调整选择区域）
+  - 文本复制功能
+  - 文本提取动画效果
+- **CADViewerViewModel.swift** - 文本提取状态管理
+  - isTextExtractionOverlayPresented 状态
+  - textExtractionSelectionDragStartRect 状态
+  - textExtractionSelectionResizeStartRect 状态
+  - 文本选择区域管理
 
 #### 更新 CADBridge 核心
-- `TviActivator.cpp` - 激活器更新（+48 行）
-- `TviCore.hpp` - 核心引擎头文件增强（+7 行）
-- `TviCore.mm` - 核心引擎实现增强（+54 行）
-- `CADBaseViewController.h` - 基础视图控制器头文件（+7 行）
-- `CADBaseViewController.mm` - 基础视图控制器实现增强（+163 行）
-
-#### 新增配置文件
-- `Info.plist` - 应用信息配置（109 行）
+- **TviCore.hpp** - 核心引擎头文件增强（+10 行）
+  - 添加测量相关方法声明
+  - 添加文本提取相关方法声明
+- **TviCore.mm** - 核心引擎实现增强（+36 行）
+  - 实现测量功能桥接
+  - 实现文本提取功能桥接
+- **CADBaseViewController.h** - 基础视图控制器头文件（+19 行）
+  - 添加测量相关方法声明
+  - 添加文本提取相关方法声明
+- **CADBaseViewController.mm** - 基础视图控制器实现增强（+535 行）
+  - 实现测量点选择和编辑
+  - 实现测量结果显示
+  - 实现文本提取功能
+  - 实现文本选择区域管理
 
 #### 完善测试
-- `CADViewerToolbarItemTests.swift` - CAD 查看器工具栏测试（33 行）
-- `ConversionDocumentStoreTests.swift` - 增强转换存储测试（+290 行）
+- **CADViewerToolbarItemTests.swift** - 增强工具栏测试（+147 行）
+  - 添加测量工具栏测试
+  - 添加文本提取功能测试
+  - 验证工具栏切换逻辑
 
-#### 更新 HomeView
-- `HomeView.swift` - 更新主视图逻辑（+11 行）
+#### 更新桥接视图
+- **CADViewerBridgeView.swift** - 更新桥接视图（+6 行）
+  - 集成测量功能
+  - 集成文本提取功能
 
 #### 添加图标资源
-- 重命名图标
-- 默认文字图标
-- 其他 CAD 功能图标
+- **坐标图标** - 用于测量坐标显示
+- **设置图标** - 用于设置面板
+- **其他 CAD 功能图标**
 
 ### 提交说明
-本次提交主要增强了单位转换功能和 CAD 查看器：
+本次提交主要增强了 CAD 查看器的测量和文本提取功能：
 
-1. **单位转换增强**：
-   - 支持外部文件导入进行转换
-   - 添加文档预览功能，可直接预览转换后的 CAD 文件
-   - 实现完整的 ConversionDocument 数据模型
-   - 支持 CAD 文件直接预览或系统预览
+1. **测量工具增强**：
+   - 实现完整的测量覆盖层，支持距离、角度、半径、坐标测量
+   - 添加测量工具栏，提供便捷的测量工具切换
+   - 支持测量点选择和编辑，用户可以调整测量结果
+   - 实现测量结果显示和格式化，提供清晰的测量数据展示
 
-2. **CAD 转换桥接**：
-   - 实现 Objective-C 桥接层（CADConversionBridge）
-   - 实现 Swift 转换引擎（CADConversionEngine）
-   - 支持 DWG/DXF 文件格式的转换
+2. **文本提取增强**：
+   - 实现文本提取覆盖层，从 CAD 图纸中提取文本内容
+   - 支持拖拽选择和调整选择区域，提供灵活的文本选择方式
+   - 支持文本复制功能，方便用户使用提取的文本
+   - 添加平滑的动画效果，提升用户体验
 
-3. **CAD 查看器增强**：
-   - 添加工具栏功能，提供更多交互选项
-   - 支持通过文件路径加载 CAD 文件
-   - 增强视图模型，支持更复杂的状态管理
+3. **CADBridge 核心更新**：
+   - 更新 TviCore 核心引擎，添加测量和文本提取相关的桥接方法
+   - 增强 CADBaseViewController 基础视图控制器，实现测量和文本提取的核心逻辑
+   - 提供完整的测量点管理、测量结果计算、文本选择区域管理等功能
 
-4. **导航架构升级**：
-   - 添加 importedConversion 路由，支持外部文件导入
-   - 添加 conversionDocumentPreview 路由，支持文档预览
+4. **视图模型增强**：
+   - 添加测量工具栏状态管理（isMeasurementToolbarPresented）
+   - 添加文本提取覆盖层状态管理（isTextExtractionOverlayPresented）
+   - 添加文本选择区域状态管理
+   - 增强工具栏切换逻辑，支持测量、文本提取、标注等工具的无缝切换
+
+5. **测试完善**：
+   - 增强 CADViewerToolbarItemTests，添加测量和文本提取相关的测试用例
+   - 验证工具栏切换逻辑的正确性
+   - 确保测量和文本提取功能的稳定性
+
+这为 CAD 查看器提供了更强大的测量和文本提取能力，用户可以在查看 CAD 图纸时进行精确测量和文本提取，提升了应用的实用性和用户体验。
+
+---
+
+## 上次提交 (2026-04-13)
    - 实现外部文件导入的告警处理
 
 5. **CADBridge 核心更新**：

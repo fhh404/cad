@@ -5,6 +5,7 @@
 #import "AppCore/TviImportParameters.hpp"
 #import "AppCore/TviTools.h"
 #import "CADEngineBootstrap.h"
+#import "CADFontSupport.h"
 #import "RenderViewController.h"
 
 #include "../../可视化真机/Drawing/Include/DbBlockReference.h"
@@ -116,6 +117,11 @@ CADTextExtractionServices *CADSharedTextExtractionServices()
     static OdStaticRxObject<CADTextExtractionServices> services;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
+        // Ensure ACAD / ACADFONTS / FONTMAP env vars are exported before
+        // ODA initializes its host services, so text extraction honours the
+        // same font search path as the visual viewer and Chinese strings
+        // are decoded through the same SHX big fonts.
+        [CADFontSupport setupIfNeeded];
         odInitialize(&services);
     });
     return &services;

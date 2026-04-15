@@ -29,6 +29,8 @@
 		625888F8BE5D25736808C472 /* CADViewerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 758E87CFCCC932C4D39FC801 /* CADViewerViewModel.swift */; };
 		690F77A68421A4C71312B133 /* TviActivator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B2931A55DC6712E1DAFC7F4C /* TviActivator.cpp */; };
 		75BC06228B156ABFB6571563 /* CADEngineBootstrap.mm in Sources */ = {isa = PBXBuildFile; fileRef = CB75FB1333EAFBFF2463AD38 /* CADEngineBootstrap.mm */; };
+		CADF070000000000000000A3 /* CADFontSupport.mm in Sources */ = {isa = PBXBuildFile; fileRef = CADF070000000000000000A2 /* CADFontSupport.mm */; };
+		CADF070000000000000000A5 /* Fonts in Resources */ = {isa = PBXBuildFile; fileRef = CADF070000000000000000A4 /* Fonts */; };
 		939DDBE22D43599A43620D04 /* ConversionDocumentStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 595C0E7A9F688C3D3D6E7B74 /* ConversionDocumentStoreTests.swift */; };
 		93D8D913CA56B58AF98590B0 /* TviGlobalParameters.mm in Sources */ = {isa = PBXBuildFile; fileRef = 89C1C9D12C98B2C9BC330361 /* TviGlobalParameters.mm */; };
 		9847AFE9233C07E8CC75FD6A /* TviAxisControl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 12FC66DFB0EA09D0A0FD36B5 /* TviAxisControl.cpp */; };
@@ -123,6 +125,9 @@
 		C8BAEA4D68A9F046D0EC266D /* ConversionScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ConversionScreen.swift; sourceTree = "<group>"; };
 		CAD00001AA330001CC120001 /* CADViewerToolbarItemTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CADViewerToolbarItemTests.swift; path = CADFPTests/CADViewerToolbarItemTests.swift; sourceTree = "<group>"; };
 		CB75FB1333EAFBFF2463AD38 /* CADEngineBootstrap.mm */ = {isa = PBXFileReference; includeInIndex = 1; path = CADEngineBootstrap.mm; sourceTree = "<group>"; };
+		CADF070000000000000000A1 /* CADFontSupport.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CADFontSupport.h; sourceTree = "<group>"; };
+		CADF070000000000000000A2 /* CADFontSupport.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; path = CADFontSupport.mm; sourceTree = "<group>"; };
+		CADF070000000000000000A4 /* Fonts */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Fonts; sourceTree = "<group>"; };
 		CDA978F1BECAF3CB17E61FF0 /* TviAxisControl.hpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.h; path = TviAxisControl.hpp; sourceTree = "<group>"; };
 		CEB1738F6356C259E0C53178 /* TviProgressMeter.mm */ = {isa = PBXFileReference; includeInIndex = 1; path = TviProgressMeter.mm; sourceTree = "<group>"; };
 		CF100001AA110001CC120001 /* CalculatorModels.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CalculatorModels.swift; sourceTree = "<group>"; };
@@ -193,6 +198,8 @@
 				CFC0D003AA220001CC120001 /* CADConversionBridge.mm */,
 				EA44A5AB9B6B0F590B1BB492 /* CADEngineBootstrap.h */,
 				CB75FB1333EAFBFF2463AD38 /* CADEngineBootstrap.mm */,
+				CADF070000000000000000A1 /* CADFontSupport.h */,
+				CADF070000000000000000A2 /* CADFontSupport.mm */,
 				55713757129A941F6ACE5705 /* CADLayerItem.h */,
 				535581FED2FF68B0D2CD82C2 /* CADLayerItem.m */,
 				10C3BA369C4FF70B7445C35B /* RenderViewController.h */,
@@ -239,6 +246,7 @@
 			children = (
 				B7F10000AA110001CC120001 /* Info.plist */,
 				48A740632F8789EA00465BAE /* Assets.xcassets */,
+				CADF070000000000000000A4 /* Fonts */,
 				4877ED752F87B49E005709DC /* Sample.dwg */,
 				48A740642F8789EA00465BAE /* CADFPApp.swift */,
 				48A740652F8789EA00465BAE /* ContentView.swift */,
@@ -459,6 +467,7 @@
 			files = (
 				4877ED762F87B49E005709DC /* Sample.dwg in Resources */,
 				48A740692F8789EA00465BAE /* Assets.xcassets in Resources */,
+				CADF070000000000000000A5 /* Fonts in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -509,6 +518,7 @@
 				0C849EC8A4214B1FB65C7941 /* TviProgressControl.m in Sources */,
 				5BA54139AF5E5A7392C00025 /* CADBaseViewController.mm in Sources */,
 				75BC06228B156ABFB6571563 /* CADEngineBootstrap.mm in Sources */,
+				CADF070000000000000000A3 /* CADFontSupport.mm in Sources */,
 				4E039D043BB8643B3DED18B6 /* CADLayerItem.m in Sources */,
 				BFC0D002AA220001CC120001 /* CADConversionBridge.mm in Sources */,
 				0E6232669D8A04CE92D25D85 /* RenderViewController.mm in Sources */,
